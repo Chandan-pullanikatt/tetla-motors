@@ -202,7 +202,7 @@ export default function Home() {
                     playsInline
                   />
                 </Parallax>
-                <div className="absolute inset-0 bg-black/35 z-10" />
+                <div className="absolute inset-0 bg-black/50 z-10" />
                 <div className="relative z-20 flex h-full flex-col justify-start p-8 pt-10">
                   <h3 className="text-2xl font-bold">
                     On The Road To Safety
@@ -228,10 +228,10 @@ export default function Home() {
                     playsInline
                   />
                 </Parallax>
-                <div className="absolute inset-0 bg-black/35 z-10" />
+                <div className="absolute inset-0 bg-black/50 z-10" />
                 <div className="relative z-20 flex h-full flex-col justify-start p-8 pt-10">
-                  <h3 className="text-xl font-bold uppercase">
-                    LOW EMISSIONS & EFFICIENCY
+                  <h3 className="text-xl font-bold ">
+                    Low Emissions & Efficiency
                   </h3>
                   <p className="mt-2 text-sm text-gray-200">
                     TETLA Bikes Produce Zero Emissions And Deliver Energy-Efficient Performance
@@ -254,7 +254,7 @@ export default function Home() {
                     playsInline
                   />
                 </Parallax>
-                <div className="absolute inset-0 bg-black/35 z-10" />
+                <div className="absolute inset-0 bg-black/50 z-10" />
                 <div className="relative z-20 flex h-full flex-col justify-start p-8 pt-10">
                   <h3 className="text-xl font-bold">Premium Design</h3>
                   <p className="mt-2 max-w-2xl text-sm text-gray-200">
@@ -280,11 +280,12 @@ export default function Home() {
             </h2>
           </Reveal>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide justify-start md:justify-center">
             {["/pb1.jpg", "/pb2.jpg", "/pb3.jpg", "/pb4.jpg"].map(
               (src, idx) => (
                 <article
-                  className="group relative h-[500px] overflow-hidden rounded-3xl shadow-lg"
+                  key={idx}
+                  className="group relative flex-none w-[280px] h-[500px] overflow-hidden rounded-3xl shadow-lg snap-center"
                 >
                   <img
                     src={src}
