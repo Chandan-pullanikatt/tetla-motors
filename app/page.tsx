@@ -118,15 +118,15 @@ export default function Home() {
             </p>
 
             <div className="mt-8 flex items-center gap-8">
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-white/10">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-1">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white-400 mb-1">
                   Electric Range
                 </p>
                 <p className="text-2xl font-bold">Up to 100 Km</p>
               </div>
               <div className="h-10 w-px bg-white/20"></div>
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-white/10">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-1">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white-400 mb-1">
                   Full Charge
                 </p>
                 <p className="text-2xl font-bold">2 to 4 Hrs</p>
@@ -156,7 +156,10 @@ export default function Home() {
             </h2>
           </Reveal>
 
-          <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide">
+          <div
+            className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide"
+            data-lenis-prevent
+          >
             {[
               { src: "/pa1.jpg" },
               { src: "/pa3.jpg" },
@@ -167,7 +170,7 @@ export default function Home() {
             ].map((item, idx) => (
               <Reveal key={idx} delay={idx * 0.1}>
                 <article
-                  className="group relative flex-none w-[350px] h-[500px] flex flex-col overflow-hidden rounded-3xl shadow-xl snap-center"
+                  className="group relative flex-none w-[350px] h-[500px] flex flex-col overflow-hidden rounded-[12px] shadow-xl snap-center"
                 >
                   <Parallax className="absolute inset-0 h-full w-full" scale={1.2} speed={0.3}>
                     <img
@@ -221,7 +224,7 @@ export default function Home() {
           <div className="grid gap-6 md:grid-cols-2">
             {/* Card 1 (Left - Tall) */}
             <Reveal delay={0.1} className="md:row-span-2">
-              <article className="relative h-full min-h-[300px] md:min-h-[600px] overflow-hidden rounded-3xl border border-white/5 bg-white/5">
+              <article className="relative h-full min-h-[300px] md:min-h-[600px] overflow-hidden rounded-[12px] border border-white/5 bg-white/5">
                 <Parallax className="absolute inset-0 h-full w-full" scale={1.1}>
                   <video
                     className="h-full w-full object-cover"
@@ -247,7 +250,7 @@ export default function Home() {
 
             {/* Card 2 (Top Right) */}
             <Reveal delay={0.2}>
-              <article className="relative h-[280px] md:h-[300px] overflow-hidden rounded-3xl border border-white/5 bg-white/5">
+              <article className="relative h-[280px] md:h-[300px] overflow-hidden rounded-[12px] border border-white/5 bg-white/5">
                 <Parallax className="absolute inset-0 h-full w-full" scale={1.1}>
                   <video
                     className="h-full w-full object-cover"
@@ -273,7 +276,7 @@ export default function Home() {
 
             {/* Card 3 (Bottom Right) */}
             <Reveal delay={0.3}>
-              <article className="relative h-[280px] md:h-[300px] overflow-hidden rounded-3xl border border-white/5 bg-white/5">
+              <article className="relative h-[280px] md:h-[300px] overflow-hidden rounded-[12px] border border-white/5 bg-white/5">
                 <Parallax className="absolute inset-0 h-full w-full" scale={1.1}>
                   <video
                     className="h-full w-full object-cover"
@@ -310,12 +313,15 @@ export default function Home() {
             </h2>
           </Reveal>
 
-          <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide justify-start md:justify-center">
+          <div
+            className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide justify-start"
+            data-lenis-prevent
+          >
             {["/pb1.jpg", "/pb2.jpg", "/pb3.jpg", "/pb4.jpg"].map(
               (src, idx) => (
                 <article
                   key={idx}
-                  className="group relative flex-none w-[280px] h-[500px] overflow-hidden rounded-3xl shadow-lg snap-center"
+                  className="group relative flex-none w-[280px] h-[500px] overflow-hidden rounded-[12px] shadow-lg snap-center"
                 >
                   <img
                     src={src}
@@ -409,7 +415,7 @@ export default function Home() {
                 <article
                   className="flex flex-col gap-4"
                 >
-                  <div className="relative w-full aspect-[3/4] overflow-hidden rounded-2xl bg-gray-100">
+                  <div className="relative w-full aspect-[3/4] overflow-hidden rounded-[12px] bg-gray-100">
                     <Parallax className="absolute inset-0 h-full w-full" scale={1.1}>
                       <img
                         src={person.src}
@@ -442,7 +448,7 @@ export default function Home() {
           </Reveal>
 
           <Reveal delay={0.2}>
-            <div className="relative overflow-hidden rounded-3xl bg-[#111] shadow-2xl">
+            <div className="relative overflow-hidden rounded-[12px] bg-[#111] shadow-2xl">
               <div className="grid md:grid-cols-2">
                 {/* Form Side */}
                 <div className="p-8 md:p-12 lg:p-16 z-10 relative bg-[#111]">
