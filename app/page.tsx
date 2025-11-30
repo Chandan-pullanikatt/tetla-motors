@@ -132,11 +132,12 @@ export default function Home() {
               { src: "/pa3.jpg" },
               { src: "/pa2.jpg" },
               { src: "/pa4.jpg" },
+              { src: "/pa5.jpg" },
               { src: "/pa6.jpg" },
             ].map((item, idx) => (
               <Reveal key={idx} delay={idx * 0.1}>
                 <article
-                  className="group relative flex-none w-[350px] h-[400px] flex flex-col overflow-hidden rounded-3xl shadow-xl snap-center"
+                  className="group relative flex-none w-[350px] h-[500px] flex flex-col overflow-hidden rounded-3xl shadow-xl snap-center"
                 >
                   <Parallax className="absolute inset-0 h-full w-full" scale={1.2} speed={0.3}>
                     <img
