@@ -80,44 +80,36 @@ export default function Home() {
         {/* Hero text block */}
         <div className="relative z-20 flex h-full flex-col justify-end pb-20">
           <div className="max-w-[1200px] px-6 md:px-16 w-full">
-            <Reveal delay={0.2}>
-              <h1 className="text-5xl font-bold tracking-tight text-white md:text-7xl">
-                TETLA <span className="font-normal">Classic</span>
-              </h1>
-            </Reveal>
-            <Reveal delay={0.4}>
-              <p className="mt-2 text-lg text-gray-200 font-light tracking-wide">
-                Efficient, stylish, and built for city rides
-              </p>
-            </Reveal>
+            <h1 className="text-5xl font-bold tracking-tight text-white md:text-7xl">
+              TETLA <span className="font-normal">Classic</span>
+            </h1>
+            <p className="mt-2 text-lg text-gray-200 font-light tracking-wide">
+              Efficient, stylish, and built for city rides
+            </p>
 
-            <Reveal delay={0.6}>
-              <div className="mt-8 flex items-center gap-8">
-                <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-white/10">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-1">
-                    Electric Range
-                  </p>
-                  <p className="text-2xl font-bold">Up to 100 Km</p>
-                </div>
-                <div className="h-10 w-px bg-white/20"></div>
-                <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-white/10">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-1">
-                    Full Charge
-                  </p>
-                  <p className="text-2xl font-bold">2 to 4 Hrs</p>
-                </div>
+            <div className="mt-8 flex items-center gap-8">
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-white/10">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-1">
+                  Electric Range
+                </p>
+                <p className="text-2xl font-bold">Up to 100 Km</p>
               </div>
-            </Reveal>
+              <div className="h-10 w-px bg-white/20"></div>
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-white/10">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-1">
+                  Full Charge
+                </p>
+                <p className="text-2xl font-bold">2 to 4 Hrs</p>
+              </div>
+            </div>
 
             {/* Indicators */}
-            <Reveal delay={0.8}>
-              <div className="mt-10 flex gap-2">
-                <div className="h-1 w-8 bg-white rounded-full"></div>
-                <div className="h-1 w-8 bg-white/30 rounded-full"></div>
-                <div className="h-1 w-8 bg-white/30 rounded-full"></div>
-                <div className="h-1 w-8 bg-white/30 rounded-full"></div>
-              </div>
-            </Reveal>
+            <div className="mt-10 flex gap-2">
+              <div className="h-1 w-8 bg-white rounded-full"></div>
+              <div className="h-1 w-8 bg-white/30 rounded-full"></div>
+              <div className="h-1 w-8 bg-white/30 rounded-full"></div>
+              <div className="h-1 w-8 bg-white/30 rounded-full"></div>
+            </div>
           </div>
         </div>
       </section>
