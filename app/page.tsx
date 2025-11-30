@@ -126,16 +126,17 @@ export default function Home() {
             </h2>
           </Reveal>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide">
             {[
               { src: "/pa1.jpg" },
               { src: "/pa3.jpg" },
               { src: "/pa2.jpg" },
               { src: "/pa4.jpg" },
+              { src: "/pa6.jpg" },
             ].map((item, idx) => (
               <Reveal key={idx} delay={idx * 0.1}>
                 <article
-                  className="group relative flex h-[500px] flex-col overflow-hidden rounded-3xl shadow-xl"
+                  className="group relative flex-none w-[350px] h-[400px] flex flex-col overflow-hidden rounded-3xl shadow-xl snap-center"
                 >
                   <Parallax className="absolute inset-0 h-full w-full" scale={1.2} speed={0.3}>
                     <img
