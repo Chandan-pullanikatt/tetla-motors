@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Footer } from "@/app/components/layout/Footer";
 import { Reveal, Parallax } from "@/app/components/ui/GsapReveal";
 
@@ -33,6 +33,15 @@ const faqs = [
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [mobileMenuOpen]);
 
   return (
     <main className="w-full overflow-x-hidden bg-black text-white">
@@ -51,7 +60,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/40" />
 
         {/* Content */}
-        <header className="relative z-20 flex items-center justify-between px-6 py-6 md:px-16">
+        <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-6 md:px-16 transition-all duration-300 bg-gradient-to-b from-black/80 to-transparent">
           {/* Logo + brand */}
           <div className="flex items-center gap-2">
             <img src="/logo.png" alt="TETLA Logo" className="h-10 w-auto object-contain" />
@@ -75,6 +84,27 @@ export default function Home() {
               Blogs
             </a>
           </nav>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="flex flex-col gap-1.5 md:hidden z-50 relative"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <div className={`h-0.5 w-6 bg-white transition-transform ${mobileMenuOpen ? "rotate-45 translate-y-2" : ""}`} />
+            <div className={`h-0.5 w-6 bg-white transition-opacity ${mobileMenuOpen ? "opacity-0" : ""}`} />
+            <div className={`h-0.5 w-6 bg-white transition-transform ${mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
+          </button>
+
+          {/* Mobile Menu Overlay */}
+          {mobileMenuOpen && (
+            <div className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 bg-black/95 text-xl font-medium text-white md:hidden">
+              <a href="#vehicles" onClick={() => setMobileMenuOpen(false)}>Products</a>
+              <a href="#ownership" onClick={() => setMobileMenuOpen(false)}>Ownership</a>
+              <a href="#dealership" onClick={() => setMobileMenuOpen(false)}>Dealership</a>
+              <a href="#about" onClick={() => setMobileMenuOpen(false)}>About</a>
+              <a href="#blogs" onClick={() => setMobileMenuOpen(false)}>Blogs</a>
+            </div>
+          )}
         </header>
 
         {/* Hero text block */}
@@ -203,11 +233,11 @@ export default function Home() {
                   />
                 </Parallax>
                 <div className="absolute inset-0 bg-black/50 z-10" />
-                <div className="relative z-20 flex h-full flex-col justify-start p-8 pt-10">
+                <div className="relative z-20 flex h-full flex-col justify-start p-6">
                   <h3 className="text-2xl font-bold">
                     On The Road To Safety
                   </h3>
-                  <p className="mt-2 text-sm text-gray-200">
+                  <p className="mt-1 text-sm text-gray-200">
                     TETLA EV Bikes Offer Advanced Safety, Strong Braking, And Clear Visibility For
                     Confident Urban Rides, Supported By Essential Rider Safety Guidance
                   </p>
@@ -229,11 +259,11 @@ export default function Home() {
                   />
                 </Parallax>
                 <div className="absolute inset-0 bg-black/50 z-10" />
-                <div className="relative z-20 flex h-full flex-col justify-start p-8 pt-10">
-                  <h3 className="text-xl font-bold ">
+                <div className="relative z-20 flex h-full flex-col justify-start p-6">
+                  <h3 className="text-2xl font-bold ">
                     Low Emissions & Efficiency
                   </h3>
-                  <p className="mt-2 text-sm text-gray-200">
+                  <p className="mt-1 text-sm text-gray-200">
                     TETLA Bikes Produce Zero Emissions And Deliver Energy-Efficient Performance
                     With Extended Range And Minimal Power Use
                   </p>
@@ -255,9 +285,9 @@ export default function Home() {
                   />
                 </Parallax>
                 <div className="absolute inset-0 bg-black/50 z-10" />
-                <div className="relative z-20 flex h-full flex-col justify-start p-8 pt-10">
-                  <h3 className="text-xl font-bold">Premium Design</h3>
-                  <p className="mt-2 max-w-2xl text-sm text-gray-200">
+                <div className="relative z-20 flex h-full flex-col justify-start p-6">
+                  <h3 className="text-2xl font-bold">Premium Design</h3>
+                  <p className="mt-1 max-w-2xl text-sm text-gray-200">
                     TETLA Bikes Feature A Premium Design That Blends Sleek Aesthetics With Durable,
                     High-Quality Engineering For A Refined Riding Experience.
                   </p>

@@ -62,7 +62,7 @@ export function Footer() {
                     </div>
 
                     {/* Column 5: Address */}
-                    <div className="text-right lg:text-right">
+                    <div className="text-left lg:text-right">
                         <h4 className="text-[#999] mb-6 text-sm">Registered Office Address</h4>
                         <p className="text-sm leading-relaxed mb-4">
                             Doaaa Building,<br />
