@@ -282,32 +282,28 @@ export default function Home() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {["/pb1.jpg", "/pb2.jpg", "/pb3.jpg", "/pb4.jpg"].map(
               (src, idx) => (
-                <Reveal key={idx} delay={idx * 0.1}>
-                  <article
-                    className="group relative h-[320px] overflow-hidden rounded-3xl shadow-lg"
-                  >
-                    <Parallax className="absolute inset-0 h-full w-full" scale={1.2}>
-                      <img
-                        src={src}
-                        alt="Testimonial"
-                        className="h-full w-full object-cover transition-transform duration-500"
-                      />
-                    </Parallax>
-                    <div className="absolute inset-0 bg-black/20 z-10" />
-                    {/* Play button */}
-                    <div className="absolute inset-0 flex items-center justify-center z-20">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg">
-                        <svg
-                          viewBox="0 0 24 24"
-                          aria-hidden="true"
-                          className="h-6 w-6 text-black"
-                        >
-                          <path d="M9 7.5v9l7-4.5-7-4.5z" />
-                        </svg>
-                      </div>
+                <article
+                  className="group relative h-[500px] overflow-hidden rounded-3xl shadow-lg"
+                >
+                  <img
+                    src={src}
+                    alt="Testimonial"
+                    className="h-full w-full object-cover transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-black/20 z-10" />
+                  {/* Play button */}
+                  <div className="absolute inset-0 flex items-center justify-center z-20">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg">
+                      <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        className="h-6 w-6 text-black"
+                      >
+                        <path d="M9 7.5v9l7-4.5-7-4.5z" />
+                      </svg>
                     </div>
-                  </article>
-                </Reveal>
+                  </div>
+                </article>
               ),
             )}
           </div>
