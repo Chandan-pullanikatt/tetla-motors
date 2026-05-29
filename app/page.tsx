@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { Footer } from "@/app/components/layout/Footer";
 import { Reveal, Parallax } from "@/app/components/ui/GsapReveal";
+import { LazyVideo } from "@/app/components/ui/LazyVideo";
+import { createClient } from "@/lib/supabase/client";
 
 const faqs = [
   {
@@ -31,9 +34,58 @@ const faqs = [
   },
 ];
 
+// Fallback to static files when CMS videos aren't set yet
+const VIDEO_DEFAULTS: Record<string, string> = {
+  hero: "/v1.mp4",
+  va1: "/va1.mp4",
+  va2: "/va2.mp4",
+  va3: "/va3.mp4",
+  lineup: "/lineup.mp4",
+  testimonial_1: "/pb1.jpg",
+  testimonial_2: "/pb2.jpg",
+  testimonial_3: "/pb3.jpg",
+  testimonial_4: "/pb4.jpg",
+};
+
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [videos, setVideos] = useState<Record<string, string>>(VIDEO_DEFAULTS);
+
+  // Enquiry form state
+  const [formData, setFormData] = useState({
+    name: "", email: "", phone: "", enquiry_type: "", message: "", newsletter: false,
+  });
+  const [formStatus, setFormStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  const handleEnquiry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormStatus("sending");
+    try {
+      const res = await fetch("/api/enquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) throw new Error();
+      setFormStatus("sent");
+      setFormData({ name: "", email: "", phone: "", enquiry_type: "", message: "", newsletter: false });
+    } catch {
+      setFormStatus("error");
+    }
+  };
+
+  useEffect(() => {
+    const loadVideos = async () => {
+      const supabase = createClient();
+      const { data } = await supabase.from("site_videos").select("key, url");
+      if (!data) return;
+      const map: Record<string, string> = { ...VIDEO_DEFAULTS };
+      data.forEach(({ key, url }) => { if (url) map[key] = url; });
+      setVideos(map);
+    };
+    loadVideos();
+  }, []);
 
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -47,45 +99,39 @@ export default function Home() {
     <main className="w-full overflow-x-hidden bg-black text-white">
       {/* NAV + HERO */}
       <section className="relative h-screen w-full overflow-hidden">
-        {/* Background video */}
+        {/* Background video — hero loads immediately */}
         <video
           className="absolute inset-0 h-full w-full object-cover"
           autoPlay
           muted
           loop
           playsInline
-          src="/v1.mp4"
+          preload="metadata"
+          src={videos.hero}
         />
-        {/* Dark overlay */}
         <div className="absolute inset-0 bg-black/40" />
 
         {/* Content */}
         <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-6 md:px-16 transition-all duration-300 bg-gradient-to-b from-black/80 to-transparent">
-          {/* Logo + brand */}
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="TETLA Logo" className="h-10 w-auto object-contain" />
+            <Image
+              src="/logo.png"
+              alt="TETLA Logo"
+              width={200}
+              height={40}
+              className="h-10 w-auto object-contain"
+              priority
+            />
           </div>
 
-          {/* Nav */}
           <nav className="hidden gap-8 text-sm font-medium text-gray-200 md:flex">
-            <a href="#vehicles" className="hover:text-white transition-colors">
-              Products
-            </a>
-            <a href="#ownership" className="hover:text-white transition-colors">
-              Ownership
-            </a>
-            <a href="#dealership" className="hover:text-white transition-colors">
-              Dealership
-            </a>
-            <a href="#about" className="hover:text-white transition-colors">
-              About
-            </a>
-            <a href="#blogs" className="hover:text-white transition-colors">
-              Blogs
-            </a>
+            <a href="#vehicles" className="hover:text-white transition-colors">Products</a>
+            <a href="#ownership" className="hover:text-white transition-colors">Ownership</a>
+            <a href="#dealership" className="hover:text-white transition-colors">Dealership</a>
+            <a href="#about" className="hover:text-white transition-colors">About</a>
+            <a href="#blogs" className="hover:text-white transition-colors">Blogs</a>
           </nav>
 
-          {/* Mobile Menu Button */}
           <button
             className="flex flex-col gap-1.5 md:hidden z-50 relative"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -95,7 +141,6 @@ export default function Home() {
             <div className={`h-0.5 w-6 bg-white transition-transform ${mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
           </button>
 
-          {/* Mobile Menu Overlay */}
           {mobileMenuOpen && (
             <div className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 bg-black/95 text-xl font-medium text-white md:hidden">
               <a href="#vehicles" onClick={() => setMobileMenuOpen(false)}>Products</a>
@@ -107,7 +152,6 @@ export default function Home() {
           )}
         </header>
 
-        {/* Hero text block */}
         <div className="relative z-20 flex h-full flex-col justify-end pb-20">
           <div className="max-w-[1200px] px-6 md:px-16 w-full">
             <h1 className="text-5xl font-bold tracking-tight text-white md:text-7xl">
@@ -119,21 +163,16 @@ export default function Home() {
 
             <div className="mt-8 flex items-center gap-8">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white-400 mb-1">
-                  Electric Range
-                </p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white-400 mb-1">Electric Range</p>
                 <p className="text-2xl font-bold">Up to 100 Km</p>
               </div>
               <div className="h-10 w-px bg-white/20"></div>
               <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white-400 mb-1">
-                  Full Charge
-                </p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white-400 mb-1">Full Charge</p>
                 <p className="text-2xl font-bold">2 to 4 Hrs</p>
               </div>
             </div>
 
-            {/* Indicators */}
             <div className="mt-10 flex gap-2">
               <div className="h-1 w-8 bg-white rounded-full"></div>
               <div className="h-1 w-8 bg-white/30 rounded-full"></div>
@@ -145,10 +184,7 @@ export default function Home() {
       </section>
 
       {/* EXPLORE ALL VEHICLES */}
-      <section
-        id="vehicles"
-        className="bg-white py-20 text-black md:py-28"
-      >
+      <section id="vehicles" className="bg-white py-20 text-black md:py-28">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-12 px-5 sm:px-6">
           <Reveal>
             <h2 className="text-center text-3xl font-semibold tracking-tight md:text-4xl">
@@ -169,32 +205,26 @@ export default function Home() {
               { src: "/pa6.jpg" },
             ].map((item, idx) => (
               <Reveal key={idx} delay={idx * 0.1}>
-                <article
-                  className="group relative flex-none w-[350px] h-[500px] flex flex-col overflow-hidden rounded-[12px] shadow-xl snap-center"
-                >
-                  <Parallax className="absolute inset-0 h-full w-full" scale={1.2} speed={0.3}>
-                    <img
+                <article className="group relative flex-none w-[350px] h-[500px] flex flex-col overflow-hidden rounded-[12px] shadow-xl snap-center">
+                  <div className="absolute inset-0 h-full w-full">
+                    <Image
                       src={item.src}
                       alt="Vehicle"
-                      className="h-full w-full object-cover transition-transform duration-500"
+                      fill
+                      sizes="350px"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
                     />
-                  </Parallax>
-                  {/* gradient + content */}
+                  </div>
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
                   <div className="pointer-events-none absolute inset-0 flex flex-col justify-end gap-4 p-5 text-white z-20">
                     <div>
-                      <h3 className="text-lg font-semibold">
-                        TETLA Classic (RTO Model)
-                      </h3>
-                      <p className="mt-1 text-xs text-gray-200">
-                        Efficient, stylish, and built for city rides
-                      </p>
+                      <h3 className="text-lg font-semibold">TETLA Classic (RTO Model)</h3>
+                      <p className="mt-1 text-xs text-gray-200">Efficient, stylish, and built for city rides</p>
                     </div>
                     <div className="flex items-end justify-between">
                       <div>
-                        <p className="text-[11px] uppercase tracking-[0.16em] text-gray-300">
-                          Starting from
-                        </p>
+                        <p className="text-[11px] uppercase tracking-[0.16em] text-gray-300">Starting from</p>
                         <p className="mt-1 text-xl font-semibold">45,999</p>
                       </div>
                       <button className="pointer-events-auto rounded-md border border-white/80 bg-black/20 px-6 py-2 text-xs font-medium tracking-wide backdrop-blur-md transition hover:bg-white hover:text-black">
@@ -210,10 +240,7 @@ export default function Home() {
       </section>
 
       {/* WHY CHOOSE US */}
-      <section
-        id="why-us"
-        className="bg-[#030712] py-20 text-white md:py-28"
-      >
+      <section id="why-us" className="bg-[#030712] py-20 text-white md:py-28">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-10 px-5 sm:px-6">
           <Reveal>
             <h2 className="text-center text-3xl font-semibold tracking-tight md:text-4xl">
@@ -226,20 +253,11 @@ export default function Home() {
             <Reveal delay={0.1} className="md:row-span-2">
               <article className="relative h-full min-h-[300px] md:min-h-[600px] overflow-hidden rounded-[12px] border border-white/5 bg-white/5">
                 <Parallax className="absolute inset-0 h-full w-full" scale={1.1}>
-                  <video
-                    className="h-full w-full object-cover"
-                    src="/va1.mp4"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                  />
+                  <LazyVideo src={videos.va1} className="h-full w-full object-cover" />
                 </Parallax>
                 <div className="absolute inset-0 bg-black/50 z-10" />
                 <div className="relative z-20 flex h-full flex-col justify-start p-6">
-                  <h3 className="text-2xl font-bold">
-                    On The Road To Safety
-                  </h3>
+                  <h3 className="text-2xl font-bold">On The Road To Safety</h3>
                   <p className="mt-1 text-sm text-gray-200">
                     TETLA EV Bikes Offer Advanced Safety, Strong Braking, And Clear Visibility For
                     Confident Urban Rides, Supported By Essential Rider Safety Guidance
@@ -252,20 +270,11 @@ export default function Home() {
             <Reveal delay={0.2}>
               <article className="relative h-[280px] md:h-[300px] overflow-hidden rounded-[12px] border border-white/5 bg-white/5">
                 <Parallax className="absolute inset-0 h-full w-full" scale={1.1}>
-                  <video
-                    className="h-full w-full object-cover"
-                    src="/va2.mp4"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                  />
+                  <LazyVideo src={videos.va2} className="h-full w-full object-cover" />
                 </Parallax>
                 <div className="absolute inset-0 bg-black/50 z-10" />
                 <div className="relative z-20 flex h-full flex-col justify-start p-6">
-                  <h3 className="text-2xl font-bold ">
-                    Low Emissions & Efficiency
-                  </h3>
+                  <h3 className="text-2xl font-bold">Low Emissions & Efficiency</h3>
                   <p className="mt-1 text-sm text-gray-200">
                     TETLA Bikes Produce Zero Emissions And Deliver Energy-Efficient Performance
                     With Extended Range And Minimal Power Use
@@ -278,14 +287,7 @@ export default function Home() {
             <Reveal delay={0.3}>
               <article className="relative h-[280px] md:h-[300px] overflow-hidden rounded-[12px] border border-white/5 bg-white/5">
                 <Parallax className="absolute inset-0 h-full w-full" scale={1.1}>
-                  <video
-                    className="h-full w-full object-cover"
-                    src="/va3.mp4"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                  />
+                  <LazyVideo src={videos.va3} className="h-full w-full object-cover" />
                 </Parallax>
                 <div className="absolute inset-0 bg-black/50 z-10" />
                 <div className="relative z-20 flex h-full flex-col justify-start p-6">
@@ -302,10 +304,7 @@ export default function Home() {
       </section>
 
       {/* VOICES THAT INSPIRE US */}
-      <section
-        id="voices"
-        className="bg-white py-20 text-black md:py-28"
-      >
+      <section id="voices" className="bg-white py-20 text-black md:py-28">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-12 px-5 sm:px-6">
           <Reveal>
             <h2 className="text-center text-3xl font-semibold tracking-tight md:text-4xl">
@@ -317,51 +316,47 @@ export default function Home() {
             className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide justify-start"
             data-lenis-prevent
           >
-            {["/pb1.jpg", "/pb2.jpg", "/pb3.jpg", "/pb4.jpg"].map(
-              (src, idx) => (
+            {(["testimonial_1", "testimonial_2", "testimonial_3", "testimonial_4"] as const).map((key, idx) => {
+              const src = videos[key];
+              const isVideo = src.includes("cloudinary.com") || src.endsWith(".mp4") || src.endsWith(".webm");
+              return (
                 <article
                   key={idx}
                   className="group relative flex-none w-[280px] h-[500px] overflow-hidden rounded-[12px] shadow-lg snap-center"
                 >
-                  <img
-                    src={src}
-                    alt="Testimonial"
-                    className="h-full w-full object-cover transition-transform duration-500"
-                  />
+                  {isVideo ? (
+                    <LazyVideo src={src} className="h-full w-full object-cover" />
+                  ) : (
+                    <Image
+                      src={src}
+                      alt="Testimonial"
+                      fill
+                      sizes="280px"
+                      className="object-cover transition-transform duration-500"
+                      loading="lazy"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-black/20 z-10" />
-                  {/* Play button */}
-                  <div className="absolute inset-0 flex items-center justify-center z-20">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg">
-                      <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        className="h-6 w-6 text-black"
-                      >
-                        <path d="M9 7.5v9l7-4.5-7-4.5z" />
-                      </svg>
+                  {!isVideo && (
+                    <div className="absolute inset-0 flex items-center justify-center z-20">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 text-black">
+                          <path d="M9 7.5v9l7-4.5-7-4.5z" />
+                        </svg>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </article>
-              ),
-            )}
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* JOIN US CTA */}
-      <section
-        id="about"
-        className="relative h-[260px] w-full md:h-[320px]"
-      >
+      <section id="about" className="relative h-[260px] w-full md:h-[320px]">
         <Parallax className="absolute inset-0 h-full w-full" scale={1.1} speed={0.2}>
-          <video
-            className="h-full w-full object-cover"
-            src="/lineup.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-          />
+          <LazyVideo src={videos.lineup} className="h-full w-full object-cover" />
         </Parallax>
         <div className="absolute inset-0 bg-black/45 z-10" />
         <div className="relative z-20 flex h-full items-center justify-center px-4">
@@ -371,8 +366,7 @@ export default function Home() {
                 Join Us In Redefining The Future Of Urban Mobility
               </h2>
               <p className="mt-3 text-sm text-gray-200">
-                Discover smart, sustainable vehicles designed for performance,
-                comfort, and next-gen mobility.
+                Discover smart, sustainable vehicles designed for performance, comfort, and next-gen mobility.
               </p>
               <button className="mt-6 rounded-full border border-white/80 bg-white/10 px-6 py-2 text-sm font-medium tracking-wide backdrop-blur-md transition hover:bg-white hover:text-black">
                 Learn More About Us
@@ -383,10 +377,7 @@ export default function Home() {
       </section>
 
       {/* MEET THE FOUNDERS */}
-      <section
-        id="ownership"
-        className="bg-white py-20 text-black md:py-28"
-      >
+      <section id="ownership" className="bg-white py-20 text-black md:py-28">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-12 px-5 sm:px-6">
           <Reveal>
             <h2 className="text-center text-3xl font-semibold tracking-tight md:text-4xl">
@@ -395,32 +386,21 @@ export default function Home() {
           </Reveal>
           <div className="grid gap-8 md:grid-cols-3">
             {[
-              {
-                src: "/ceo.png",
-                name: "K T Davood",
-                role: "CEO",
-              },
-              {
-                src: "/cmd.png",
-                name: "Dr Ashraf C",
-                role: "CMD",
-              },
-              {
-                src: "/cto.png",
-                name: "David Haley",
-                role: "CTO",
-              },
+              { src: "/ceo.png", name: "K T Davood", role: "CEO" },
+              { src: "/cmd.png", name: "Dr Ashraf C", role: "CMD" },
+              { src: "/cto.png", name: "David Haley", role: "CTO" },
             ].map((person, idx) => (
               <Reveal key={person.name} delay={idx * 0.1}>
-                <article
-                  className="flex flex-col gap-4"
-                >
+                <article className="flex flex-col gap-4">
                   <div className="relative w-full aspect-[3/4] overflow-hidden rounded-[12px] bg-gray-100">
                     <Parallax className="absolute inset-0 h-full w-full" scale={1.1}>
-                      <img
+                      <Image
                         src={person.src}
                         alt={person.name}
-                        className="h-full w-full object-cover object-top"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 400px"
+                        className="object-cover object-top"
+                        loading="lazy"
                       />
                     </Parallax>
                   </div>
@@ -436,10 +416,7 @@ export default function Home() {
       </section>
 
       {/* ENQUIRY FORM */}
-      <section
-        id="dealership"
-        className="bg-[#030712] py-20 text-white md:py-28"
-      >
+      <section id="dealership" className="bg-[#030712] py-20 text-white md:py-28">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <Reveal>
             <h2 className="mb-10 text-center text-3xl font-semibold tracking-tight md:text-4xl">
@@ -452,91 +429,127 @@ export default function Home() {
               <div className="grid md:grid-cols-2">
                 {/* Form Side */}
                 <div className="p-8 md:p-12 lg:p-16 z-10 relative bg-[#111]">
-                  <form className="space-y-5">
-                    <div className="space-y-5">
-                      <input
-                        className="h-14 w-full rounded-lg border border-white/5 bg-[#0A0A0A] px-4 text-sm text-gray-200 outline-none placeholder:text-gray-500 focus:border-white/20 transition-colors"
-                        placeholder="Name *"
-                      />
-                      <input
-                        type="email"
-                        className="h-14 w-full rounded-lg border border-white/5 bg-[#0A0A0A] px-4 text-sm text-gray-200 outline-none placeholder:text-gray-500 focus:border-white/20 transition-colors"
-                        placeholder="Email Address *"
-                      />
-                      <input
-                        className="h-14 w-full rounded-lg border border-white/5 bg-[#0A0A0A] px-4 text-sm text-gray-200 outline-none placeholder:text-gray-500 focus:border-white/20 transition-colors"
-                        placeholder="Phone Number *"
-                      />
-                      <div className="relative">
-                        <select className="h-14 w-full appearance-none rounded-lg border border-white/5 bg-[#0A0A0A] px-4 text-sm text-gray-500 outline-none focus:border-white/20 transition-colors">
-                          <option>Type of Enquiry</option>
-                          <option>Dealership</option>
-                          <option>Test Ride</option>
-                          <option>Product Information</option>
-                          <option>Service & Support</option>
-                        </select>
-                        <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
-                          <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        </div>
-                      </div>
-                      <textarea
-                        rows={4}
-                        className="w-full resize-none rounded-lg border border-white/5 bg-[#0A0A0A] px-4 py-4 text-sm text-gray-200 outline-none placeholder:text-gray-500 focus:border-white/20 transition-colors"
-                        placeholder="Type your message"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-3 pt-2">
-                      <div className="relative flex items-center">
-                        <input
-                          type="checkbox"
-                          id="newsletter"
-                          className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-white/20 bg-[#0A0A0A] checked:border-white checked:bg-white transition-all"
-                        />
-                        <svg
-                          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-black opacity-0 peer-checked:opacity-100 transition-opacity"
-                          width="10"
-                          height="8"
-                          viewBox="0 0 10 8"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  {formStatus === "sent" ? (
+                    <div className="flex flex-col items-center justify-center min-h-[320px] text-center">
+                      <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center mb-4">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-white">
+                          <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </div>
-                      <label htmlFor="newsletter" className="cursor-pointer text-sm text-gray-300 select-none">
-                        Yes, subscribe me to your newsletter
-                      </label>
+                      <h3 className="text-lg font-semibold text-white mb-1">Message Sent!</h3>
+                      <p className="text-sm text-gray-400">We'll get back to you shortly.</p>
+                      <button onClick={() => setFormStatus("idle")} className="mt-6 text-xs text-gray-500 underline">
+                        Send another
+                      </button>
                     </div>
+                  ) : (
+                    <form onSubmit={handleEnquiry} className="space-y-5">
+                      <div className="space-y-5">
+                        <input
+                          required
+                          className="h-14 w-full rounded-lg border border-white/5 bg-[#0A0A0A] px-4 text-sm text-gray-200 outline-none placeholder:text-gray-500 focus:border-white/20 transition-colors"
+                          placeholder="Name *"
+                          value={formData.name}
+                          onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
+                        />
+                        <input
+                          type="email"
+                          className="h-14 w-full rounded-lg border border-white/5 bg-[#0A0A0A] px-4 text-sm text-gray-200 outline-none placeholder:text-gray-500 focus:border-white/20 transition-colors"
+                          placeholder="Email Address"
+                          value={formData.email}
+                          onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
+                        />
+                        <input
+                          className="h-14 w-full rounded-lg border border-white/5 bg-[#0A0A0A] px-4 text-sm text-gray-200 outline-none placeholder:text-gray-500 focus:border-white/20 transition-colors"
+                          placeholder="Phone Number"
+                          value={formData.phone}
+                          onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))}
+                        />
+                        <div className="relative">
+                          <select
+                            className="h-14 w-full appearance-none rounded-lg border border-white/5 bg-[#0A0A0A] px-4 text-sm text-gray-500 outline-none focus:border-white/20 transition-colors"
+                            value={formData.enquiry_type}
+                            onChange={(e) => setFormData((p) => ({ ...p, enquiry_type: e.target.value }))}
+                          >
+                            <option value="">Type of Enquiry</option>
+                            <option value="Dealership">Dealership</option>
+                            <option value="Test Ride">Test Ride</option>
+                            <option value="Product Information">Product Information</option>
+                            <option value="Service & Support">Service &amp; Support</option>
+                          </select>
+                          <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
+                            <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+                              <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </div>
+                        </div>
+                        <textarea
+                          rows={4}
+                          className="w-full resize-none rounded-lg border border-white/5 bg-[#0A0A0A] px-4 py-4 text-sm text-gray-200 outline-none placeholder:text-gray-500 focus:border-white/20 transition-colors"
+                          placeholder="Type your message"
+                          value={formData.message}
+                          onChange={(e) => setFormData((p) => ({ ...p, message: e.target.value }))}
+                        />
+                      </div>
 
-                    <button
-                      type="button"
-                      className="mt-4 w-full rounded-lg bg-white py-4 text-sm font-bold text-black transition hover:bg-gray-100"
-                    >
-                      Send Message
-                    </button>
-                  </form>
+                      <div className="flex items-center gap-3 pt-2">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            id="newsletter"
+                            className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-white/20 bg-[#0A0A0A] checked:border-white checked:bg-white transition-all"
+                            checked={formData.newsletter}
+                            onChange={(e) => setFormData((p) => ({ ...p, newsletter: e.target.checked }))}
+                          />
+                          <svg
+                            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-black opacity-0 peer-checked:opacity-100 transition-opacity"
+                            width="10" height="8" viewBox="0 0 10 8" fill="none"
+                          >
+                            <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                        <label htmlFor="newsletter" className="cursor-pointer text-sm text-gray-300 select-none">
+                          Yes, subscribe me to your newsletter
+                        </label>
+                      </div>
+
+                      {formStatus === "error" && (
+                        <p className="text-red-400 text-sm">Something went wrong. Please try again.</p>
+                      )}
+
+                      <button
+                        type="submit"
+                        disabled={formStatus === "sending"}
+                        className="mt-4 w-full rounded-lg bg-white py-4 text-sm font-bold text-black transition hover:bg-gray-100 disabled:opacity-60"
+                      >
+                        {formStatus === "sending" ? "Sending…" : "Send Message"}
+                      </button>
+                    </form>
+                  )}
                 </div>
 
                 {/* Image Side */}
                 <div className="relative hidden md:block h-full min-h-[600px]">
                   <Parallax className="absolute inset-0 h-full w-full" scale={1.2}>
-                    <img
+                    <Image
                       src="/pc1.png"
                       alt="Tetla Motors"
-                      className="h-full w-full object-cover"
+                      fill
+                      sizes="50vw"
+                      className="object-cover"
+                      loading="lazy"
                     />
                   </Parallax>
-                  {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-r from-[#111] via-[#111]/50 to-transparent z-10" />
-
-                  {/* Logo Overlay */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                    <div className="flex items-center gap-2">
-                      <img src="/logo.png" alt="TETLA Logo" className="h-24 w-auto object-contain" />
-                    </div>
+                    <Image
+                      src="/logo.png"
+                      alt="TETLA Logo"
+                      width={240}
+                      height={96}
+                      className="h-24 w-auto object-contain"
+                      loading="lazy"
+                    />
                   </div>
                 </div>
               </div>
@@ -558,20 +571,14 @@ export default function Home() {
             {faqs.map((item, index) => {
               const isOpen = openFaq === index;
               return (
-                <Reveal key={index} delay={index * 0.1}>
-                  <div
-                    className="overflow-hidden rounded-2xl border border-gray-200 bg-[#FAFAFA]"
-                  >
+                <Reveal key={index} delay={index * 0.05}>
+                  <div className="overflow-hidden rounded-2xl border border-gray-200 bg-[#FAFAFA]">
                     <button
                       className="flex w-full items-center justify-between px-5 py-4 text-left text-sm font-medium md:px-6 md:py-5"
-                      onClick={() =>
-                        setOpenFaq(isOpen ? null : index)
-                      }
+                      onClick={() => setOpenFaq(isOpen ? null : index)}
                     >
                       <span>{item.q}</span>
-                      <span className="ml-4 text-xl">
-                        {isOpen ? "−" : "+"}
-                      </span>
+                      <span className="ml-4 text-xl">{isOpen ? "−" : "+"}</span>
                     </button>
                     {isOpen && (
                       <div className="border-t border-gray-200 px-5 pb-5 pt-3 text-sm text-gray-700 md:px-6">

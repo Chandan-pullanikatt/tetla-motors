@@ -55,14 +55,14 @@ interface ParallaxProps {
     children: React.ReactNode;
     className?: string;
     scale?: number;
-    speed?: number; // 0 to 1 for parallax intensity
+    speed?: number;
 }
 
 export function Parallax({
     children,
     className,
-    scale = 1.2,
-    speed = 0.5,
+    scale = 1.1,
+    speed = 0.3,
 }: ParallaxProps) {
     const container = useRef<HTMLDivElement>(null);
     const target = useRef<HTMLDivElement>(null);
@@ -70,26 +70,37 @@ export function Parallax({
     useEffect(() => {
         if (!container.current || !target.current) return;
 
-        // Initial scale
-        gsap.set(target.current, { scale: scale });
+        const mm = gsap.matchMedia();
 
-        // Parallax + Scale effect
-        gsap.to(target.current, {
-            yPercent: 20 * speed, // Move down slightly as we scroll
-            scale: 1, // Scale down to 1
-            ease: "none",
-            scrollTrigger: {
-                trigger: container.current,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: true,
-            },
-        });
+        mm.add(
+            "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
+            () => {
+                gsap.set(target.current, { scale });
+
+                gsap.to(target.current, {
+                    yPercent: 15 * speed,
+                    scale: 1,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: container.current,
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: true,
+                    },
+                });
+
+                return () => {
+                    gsap.set(target.current, { clearProps: "all" });
+                };
+            }
+        );
+
+        return () => mm.revert();
     }, [scale, speed]);
 
     return (
         <div ref={container} className={`overflow-hidden ${className}`}>
-            <div ref={target} className="h-full w-full">
+            <div ref={target} className="relative h-full w-full will-change-transform">
                 {children}
             </div>
         </div>

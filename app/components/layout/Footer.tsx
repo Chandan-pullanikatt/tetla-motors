@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -18,7 +19,7 @@ export function Footer() {
                     {/* Column 1: Logo & Slogan */}
                     <div className="lg:col-span-1">
                         <Link href="/" className="flex items-center gap-2 mb-4">
-                            <img src="/logo.png" alt="TETLA Logo" className="h-10 w-auto object-contain" />
+                            <Image src="/logo.png" alt="TETLA Logo" width={200} height={40} className="h-10 w-auto object-contain" />
                         </Link>
                         <p className="text-[#999] text-xs tracking-widest uppercase">
                             SWIFT, SILENT AND SUSTAINABLE
