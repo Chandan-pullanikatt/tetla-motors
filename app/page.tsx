@@ -6,6 +6,7 @@ import { Footer } from "@/app/components/layout/Footer";
 import { Reveal, Parallax } from "@/app/components/ui/GsapReveal";
 import { LazyVideo } from "@/app/components/ui/LazyVideo";
 import { createClient } from "@/lib/supabase/client";
+import { VoicesCoverflow } from "@/app/components/sections/VoicesCoverflow";
 
 const faqs = [
   {
@@ -99,7 +100,6 @@ export default function Home() {
     <main className="w-full overflow-x-hidden bg-black text-white">
       {/* NAV + HERO */}
       <section className="relative h-screen w-full overflow-hidden">
-        {/* Background video — hero loads immediately */}
         <video
           className="absolute inset-0 h-full w-full object-cover"
           autoPlay
@@ -111,7 +111,6 @@ export default function Home() {
         />
         <div className="absolute inset-0 bg-black/40" />
 
-        {/* Content */}
         <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-6 md:px-16 transition-all duration-300 bg-gradient-to-b from-black/80 to-transparent">
           <div className="flex items-center gap-2">
             <Image
@@ -160,80 +159,66 @@ export default function Home() {
             <p className="mt-2 text-lg text-gray-200 font-light tracking-wide">
               Efficient, stylish, and built for city rides
             </p>
-
             <div className="mt-8 flex items-center gap-8">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white-400 mb-1">Electric Range</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-1">Electric Range</p>
                 <p className="text-2xl font-bold">Up to 100 Km</p>
               </div>
-              <div className="h-10 w-px bg-white/20"></div>
+              <div className="h-10 w-px bg-white/20" />
               <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white-400 mb-1">Full Charge</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-1">Full Charge</p>
                 <p className="text-2xl font-bold">2 to 4 Hrs</p>
               </div>
             </div>
-
             <div className="mt-10 flex gap-2">
-              <div className="h-1 w-8 bg-white rounded-full"></div>
-              <div className="h-1 w-8 bg-white/30 rounded-full"></div>
-              <div className="h-1 w-8 bg-white/30 rounded-full"></div>
-              <div className="h-1 w-8 bg-white/30 rounded-full"></div>
+              <div className="h-1 w-8 bg-white rounded-full" />
+              <div className="h-1 w-8 bg-white/30 rounded-full" />
+              <div className="h-1 w-8 bg-white/30 rounded-full" />
+              <div className="h-1 w-8 bg-white/30 rounded-full" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* EXPLORE ALL VEHICLES */}
-      <section id="vehicles" className="bg-white py-20 text-black md:py-28">
-        <div className="mx-auto flex max-w-[1200px] flex-col gap-12 px-5 sm:px-6">
-          <Reveal>
-            <h2 className="text-center text-3xl font-semibold tracking-tight md:text-4xl">
-              Explore All Vehicles
-            </h2>
-          </Reveal>
-
+      {/* EXPLORE ALL VEHICLES — horizontal scroll */}
+      <section id="vehicles" className="bg-white py-20 md:py-28">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <h2 className="mb-12 text-3xl font-semibold tracking-tight text-black md:text-4xl">
+            Explore All Vehicles
+          </h2>
           <div
-            className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide"
+            className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
             data-lenis-prevent
           >
             {[
-              { src: "/pa1.jpg" },
-              { src: "/pa3.jpg" },
-              { src: "/pa2.jpg" },
-              { src: "/pa4.jpg" },
-              { src: "/pa5.jpg" },
-              { src: "/pa6.jpg" },
-            ].map((item, idx) => (
-              <Reveal key={idx} delay={idx * 0.1}>
-                <article className="group relative flex-none w-[350px] h-[500px] flex flex-col overflow-hidden rounded-[12px] shadow-xl snap-center">
-                  <div className="absolute inset-0 h-full w-full">
-                    <Image
-                      src={item.src}
-                      alt="Vehicle"
-                      fill
-                      sizes="350px"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
-                    />
+              { name: "TETLA Classic",  model: "RTO Model", price: "45,999",  image: "/pa1.jpg" },
+              { name: "TETLA E9 Pro",   model: "RTO Model", price: "62,999",  image: "/pa3.jpg" },
+              { name: "TETLA Pro Plus", model: "Premium",   price: "78,999",  image: "/pa2.jpg" },
+              { name: "TETLA Ailes",    model: "Sport",     price: "89,999",  image: "/pa4.jpg" },
+              { name: "TETLA Voiture",  model: "Elite",     price: "1,20,000", image: "/pa5.jpg" },
+            ].map((product) => (
+              <article
+                key={product.name}
+                className="relative flex-none w-[311px] h-[420px] overflow-hidden rounded-[12px] shadow-md snap-center cursor-pointer"
+              >
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  sizes="311px"
+                  className="object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-black px-4 py-4 z-10">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-gray-500">
+                    {product.model}
+                  </p>
+                  <div className="mt-1 flex items-baseline justify-between">
+                    <p className="text-base font-semibold text-white">{product.name}</p>
+                    <p className="text-sm font-bold text-white">₹{product.price}</p>
                   </div>
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
-                  <div className="pointer-events-none absolute inset-0 flex flex-col justify-end gap-4 p-5 text-white z-20">
-                    <div>
-                      <h3 className="text-lg font-semibold">TETLA Classic (RTO Model)</h3>
-                      <p className="mt-1 text-xs text-gray-200">Efficient, stylish, and built for city rides</p>
-                    </div>
-                    <div className="flex items-end justify-between">
-                      <div>
-                        <p className="text-[11px] uppercase tracking-[0.16em] text-gray-300">Starting from</p>
-                        <p className="mt-1 text-xl font-semibold">45,999</p>
-                      </div>
-                      <button className="pointer-events-auto rounded-md border border-white/80 bg-black/20 px-6 py-2 text-xs font-medium tracking-wide backdrop-blur-md transition hover:bg-white hover:text-black">
-                        Explore
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              </Reveal>
+                </div>
+              </article>
             ))}
           </div>
         </div>
@@ -304,52 +289,22 @@ export default function Home() {
       </section>
 
       {/* VOICES THAT INSPIRE US */}
-      <section id="voices" className="bg-white py-20 text-black md:py-28">
+      <section id="voices" className="bg-white py-20 text-black md:py-28 overflow-hidden select-none">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-12 px-5 sm:px-6">
           <Reveal>
             <h2 className="text-center text-3xl font-semibold tracking-tight md:text-4xl">
               Voices That Inspire Us
             </h2>
           </Reveal>
-
-          <div
-            className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide justify-start"
-            data-lenis-prevent
-          >
-            {(["testimonial_1", "testimonial_2", "testimonial_3", "testimonial_4"] as const).map((key, idx) => {
+          <VoicesCoverflow
+            items={(["testimonial_1", "testimonial_2", "testimonial_3", "testimonial_4"] as const).map((key) => {
               const src = videos[key];
-              const isVideo = src.includes("cloudinary.com") || src.endsWith(".mp4") || src.endsWith(".webm");
-              return (
-                <article
-                  key={idx}
-                  className="group relative flex-none w-[280px] h-[500px] overflow-hidden rounded-[12px] shadow-lg snap-center"
-                >
-                  {isVideo ? (
-                    <LazyVideo src={src} className="h-full w-full object-cover" />
-                  ) : (
-                    <Image
-                      src={src}
-                      alt="Testimonial"
-                      fill
-                      sizes="280px"
-                      className="object-cover transition-transform duration-500"
-                      loading="lazy"
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-black/20 z-10" />
-                  {!isVideo && (
-                    <div className="absolute inset-0 flex items-center justify-center z-20">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg">
-                        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 text-black">
-                          <path d="M9 7.5v9l7-4.5-7-4.5z" />
-                        </svg>
-                      </div>
-                    </div>
-                  )}
-                </article>
-              );
+              return {
+                src,
+                isVideo: src.includes("cloudinary.com") || src.endsWith(".mp4") || src.endsWith(".webm"),
+              };
             })}
-          </div>
+          />
         </div>
       </section>
 
