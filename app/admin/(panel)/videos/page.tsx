@@ -69,7 +69,7 @@ export default function VideosPage() {
     },
     {
       title: "Testimonial Videos",
-      keys: ["testimonial_1", "testimonial_2", "testimonial_3", "testimonial_4"],
+      keys: ["testimonial_1", "testimonial_2", "testimonial_3", "testimonial_4", "testimonial_5", "testimonial_6", "testimonial_7"],
     },
   ];
 

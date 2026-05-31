@@ -1,10 +1,8 @@
 "use client";
 
 import { useRef, useEffect, useCallback, useState } from "react";
-import Image from "next/image";
 import gsap from "gsap";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { LazyVideo } from "@/app/components/ui/LazyVideo";
 
 interface ReelItem {
   src: string;
@@ -16,10 +14,10 @@ interface VoicesCoverflowProps {
 }
 
 const POSITIONS = {
-  x:       [0,   220,  400,  550,  680],
-  rotateY: [0,   -38,  -52,  -62,  -68],
+  x:       [0,   230,  420,  580,  710],
+  rotateY: [0,   -40,  -54,  -63,  -69],
   scale:   [1,  0.86, 0.74, 0.64, 0.54],
-  opacity: [1,   0.95,  0.8,  0.55,   0],
+  opacity: [1,   0.9,  0.75, 0.45,   0],
   zIndex:  [50,   40,   30,   20,    0],
 } as const;
 
@@ -33,6 +31,44 @@ function getProps(offset: number) {
     opacity: POSITIONS.opacity[abs],
     zIndex:  POSITIONS.zIndex[abs],
   };
+}
+
+// Separate video card: controls play/pause imperatively, loads src only when near center
+function VideoCard({
+  src,
+  isActive,
+  withinRange,
+  className,
+}: {
+  src: string;
+  isActive: boolean;
+  withinRange: boolean;
+  className?: string;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Play/pause when active status changes
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (isActive) {
+      v.play().catch(() => {});
+    } else {
+      v.pause();
+    }
+  }, [isActive]);
+
+  return (
+    <video
+      ref={videoRef}
+      className={className}
+      src={withinRange ? src : undefined}
+      muted
+      loop
+      playsInline
+      preload={isActive ? "auto" : "metadata"}
+    />
+  );
 }
 
 export function VoicesCoverflow({ items }: VoicesCoverflowProps) {
@@ -51,7 +87,7 @@ export function VoicesCoverflow({ items }: VoicesCoverflowProps) {
             rotateY: props.rotateY,
             scale: props.scale,
             opacity: props.opacity,
-            duration: 0.65,
+            duration: 0.6,
             ease: "power3.out",
             overwrite: "auto",
           });
@@ -101,48 +137,41 @@ export function VoicesCoverflow({ items }: VoicesCoverflowProps) {
     <>
       {/* 3D Stage */}
       <div
-        className="relative h-[540px] md:h-[580px]"
-        style={{ perspective: "1100px" }}
+        className="relative h-[540px] md:h-[600px]"
+        style={{ perspective: "1200px" }}
         data-lenis-prevent
       >
-        {items.map((item, i) => (
-          <div
-            key={i}
-            ref={(el) => { cardRefs.current[i] = el; }}
-            onClick={() => goTo(i)}
-            className="absolute left-1/2 top-1/2 w-[260px] md:w-[280px] cursor-pointer"
-            style={{ willChange: "transform", transformOrigin: "center center" }}
-          >
-            <article
-              className={`relative overflow-hidden rounded-[12px] shadow-lg transition-shadow duration-300 h-[440px] md:h-[500px] ${
-                i === active ? "shadow-black/30" : "shadow-black/10"
-              }`}
+        {items.map((item, i) => {
+          const offset = Math.abs(i - active);
+          const withinRange = offset <= 2;
+
+          return (
+            <div
+              key={i}
+              ref={(el) => { cardRefs.current[i] = el; }}
+              onClick={() => goTo(i)}
+              className="absolute left-1/2 top-1/2 w-[220px] md:w-[270px] cursor-pointer"
+              style={{ willChange: "transform", transformOrigin: "center center" }}
             >
-              {item.isVideo ? (
-                <LazyVideo src={item.src} className="h-full w-full object-cover" />
-              ) : (
-                <Image
+              <article
+                className={`relative overflow-hidden rounded-[12px] shadow-lg transition-shadow duration-300 h-[380px] md:h-[470px] ${
+                  i === active ? "shadow-black/30" : "shadow-black/10"
+                }`}
+              >
+                <VideoCard
                   src={item.src}
-                  alt="Testimonial"
-                  fill
-                  sizes="280px"
-                  className="object-cover"
-                  loading="lazy"
+                  isActive={i === active}
+                  withinRange={withinRange}
+                  className="h-full w-full object-cover"
                 />
-              )}
-              <div className="absolute inset-0 bg-black/20 z-10" />
-              {!item.isVideo && (
-                <div className="absolute inset-0 flex items-center justify-center z-20">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg">
-                    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 text-black">
-                      <path d="M9 7.5v9l7-4.5-7-4.5z" />
-                    </svg>
-                  </div>
-                </div>
-              )}
-            </article>
-          </div>
-        ))}
+                {/* Subtle dark scrim on non-active cards */}
+                {i !== active && (
+                  <div className="absolute inset-0 bg-black/30 pointer-events-none" />
+                )}
+              </article>
+            </div>
+          );
+        })}
       </div>
 
       {/* Controls */}

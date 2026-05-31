@@ -25,7 +25,10 @@ INSERT INTO site_videos (key, label) VALUES
   ('testimonial_1', 'Testimonial 1'),
   ('testimonial_2', 'Testimonial 2'),
   ('testimonial_3', 'Testimonial 3'),
-  ('testimonial_4', 'Testimonial 4')
+  ('testimonial_4', 'Testimonial 4'),
+  ('testimonial_5', 'Testimonial 5'),
+  ('testimonial_6', 'Testimonial 6'),
+  ('testimonial_7', 'Testimonial 7')
 ON CONFLICT (key) DO NOTHING;
 
 -- RLS

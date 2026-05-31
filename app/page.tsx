@@ -36,16 +36,20 @@ const faqs = [
 ];
 
 // Fallback to static files when CMS videos aren't set yet
+// testimonial_1–7: replace via /admin/videos with real Cloudinary uploads
 const VIDEO_DEFAULTS: Record<string, string> = {
   hero: "/v1.mp4",
   va1: "/va1.mp4",
   va2: "/va2.mp4",
   va3: "/va3.mp4",
   lineup: "/lineup.mp4",
-  testimonial_1: "/pb1.jpg",
-  testimonial_2: "/pb2.jpg",
-  testimonial_3: "/pb3.jpg",
-  testimonial_4: "/pb4.jpg",
+  testimonial_1: "/va1.mp4",
+  testimonial_2: "/va2.mp4",
+  testimonial_3: "/va3.mp4",
+  testimonial_4: "/v1.mp4",
+  testimonial_5: "/va1.mp4",
+  testimonial_6: "/va2.mp4",
+  testimonial_7: "/va3.mp4",
 };
 
 export default function Home() {
@@ -329,13 +333,10 @@ export default function Home() {
             </h2>
           </Reveal>
           <VoicesCoverflow
-            items={(["testimonial_1", "testimonial_2", "testimonial_3", "testimonial_4"] as const).map((key) => {
-              const src = videos[key];
-              return {
-                src,
-                isVideo: src.includes("cloudinary.com") || src.endsWith(".mp4") || src.endsWith(".webm"),
-              };
-            })}
+            items={(["testimonial_1", "testimonial_2", "testimonial_3", "testimonial_4", "testimonial_5", "testimonial_6", "testimonial_7"] as const).map((key) => ({
+              src: videos[key],
+              isVideo: true,
+            }))}
           />
         </div>
       </section>
