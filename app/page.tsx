@@ -201,8 +201,10 @@ export default function Home() {
               Discover Tetla&apos;s smart, stylish EV bikes built for performance and convenience
             </p>
           </div>
+          <div className="overflow-hidden">
           <div
-            className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+            className="flex gap-5 overflow-x-auto snap-x snap-mandatory"
+            style={{ paddingBottom: "20px", marginBottom: "-20px" }}
             data-lenis-prevent
           >
             {[
@@ -256,6 +258,7 @@ export default function Home() {
                 </div>
               </article>
             ))}
+          </div>
           </div>
         </div>
       </section>
