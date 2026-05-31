@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Footer } from "@/app/components/layout/Footer";
 import { Reveal, Parallax } from "@/app/components/ui/GsapReveal";
@@ -56,6 +56,22 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [videos, setVideos] = useState<Record<string, string>>(VIDEO_DEFAULTS);
+  const productScrollRef = useRef<HTMLDivElement>(null);
+
+  // Route horizontal wheel events to the scroll container; let vertical events
+  // bubble to Lenis so vertical page scroll stays smooth with no stickiness.
+  useEffect(() => {
+    const el = productScrollRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) >= Math.abs(e.deltaY)) {
+        e.stopPropagation(); // horizontal intent — keep in container, Lenis doesn't see it
+      }
+      // vertical intent — bubble to window so Lenis handles it normally
+    };
+    el.addEventListener("wheel", onWheel, { passive: true });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
 
   // Enquiry form state
   const [formData, setFormData] = useState({
@@ -203,9 +219,14 @@ export default function Home() {
           </div>
           <div className="overflow-hidden">
           <div
-            className="flex gap-5 overflow-x-auto snap-x snap-mandatory"
-            style={{ paddingBottom: "20px", marginBottom: "-20px" }}
-            data-lenis-prevent
+            ref={productScrollRef}
+            className="flex gap-5 overflow-x-auto snap-x snap-proximity"
+            style={{
+              paddingBottom: "20px",
+              marginBottom: "-20px",
+              touchAction: "pan-x",
+              overscrollBehaviorX: "contain",
+            }}
           >
             {[
               { name: "TETLA Classic",  model: "RTO Model", price: "45,999",  image: "/pa1.jpg", description: "Efficient, stylish, and built for city rides" },
