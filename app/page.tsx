@@ -183,19 +183,30 @@ export default function Home() {
       {/* EXPLORE ALL VEHICLES — horizontal scroll */}
       <section id="vehicles" className="bg-white py-20 md:py-28">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
-          <h2 className="mb-12 text-3xl font-semibold tracking-tight text-black md:text-4xl">
-            Explore All Vehicles
-          </h2>
+          <div className="mb-12 text-center">
+            <h2
+              className="leading-none text-[#333333]"
+              style={{ fontWeight: 700, fontSize: "32px" }}
+            >
+              Explore All Vehicles
+            </h2>
+            <p
+              className="mt-2 leading-none text-[#555555]"
+              style={{ fontWeight: 400, fontSize: "14px" }}
+            >
+              Discover Tetla&apos;s smart, stylish EV bikes built for performance and convenience
+            </p>
+          </div>
           <div
             className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
             data-lenis-prevent
           >
             {[
-              { name: "TETLA Classic",  model: "RTO Model", price: "45,999",  image: "/pa1.jpg" },
-              { name: "TETLA E9 Pro",   model: "RTO Model", price: "62,999",  image: "/pa3.jpg" },
-              { name: "TETLA Pro Plus", model: "Premium",   price: "78,999",  image: "/pa2.jpg" },
-              { name: "TETLA Ailes",    model: "Sport",     price: "89,999",  image: "/pa4.jpg" },
-              { name: "TETLA Voiture",  model: "Elite",     price: "1,20,000", image: "/pa5.jpg" },
+              { name: "TETLA Classic",  model: "RTO Model", price: "45,999",  image: "/pa1.jpg", description: "Efficient, stylish, and built for city rides" },
+              { name: "TETLA E9 Pro",   model: "RTO Model", price: "62,999",  image: "/pa3.jpg", description: "Smart performance with premium comfort" },
+              { name: "TETLA Pro Plus", model: "Premium",   price: "78,999",  image: "/pa2.jpg", description: "Next-gen riding with advanced tech built in" },
+              { name: "TETLA Ailes",    model: "Sport",     price: "89,999",  image: "/pa4.jpg", description: "Built for speed, designed for the bold" },
+              { name: "TETLA Voiture",  model: "Elite",     price: "1,20,000", image: "/pa5.jpg", description: "The pinnacle of electric luxury on two wheels" },
             ].map((product) => (
               <article
                 key={product.name}
@@ -209,13 +220,34 @@ export default function Home() {
                   className="object-cover"
                   loading="lazy"
                 />
-                <div className="absolute bottom-0 left-0 right-0 bg-black px-4 py-4 z-10">
-                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-gray-500">
+
+                {/* Gradient overlay — transparent at 38% (≈161px), solid black at bottom */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: "linear-gradient(to bottom, transparent 38%, #000000 100%)",
+                  }}
+                />
+
+                {/* Overlaid content */}
+                <div className="absolute inset-x-0 bottom-0 z-10 p-4 flex flex-col gap-0.5">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-gray-400">
                     {product.model}
                   </p>
-                  <div className="mt-1 flex items-baseline justify-between">
-                    <p className="text-base font-semibold text-white">{product.name}</p>
-                    <p className="text-sm font-bold text-white">₹{product.price}</p>
+                  <p className="text-base font-semibold text-white leading-tight">
+                    {product.name}
+                  </p>
+                  <p className="text-[11px] text-gray-300 leading-snug">
+                    {product.description}
+                  </p>
+                  <div className="flex items-center justify-between mt-3">
+                    <div>
+                      <p className="text-[10px] text-gray-400">Starting from</p>
+                      <p className="text-lg font-bold text-white">₹{product.price}</p>
+                    </div>
+                    <button className="rounded-full border border-white/70 bg-transparent px-4 py-1.5 text-[11px] font-semibold text-white hover:bg-white hover:text-black transition">
+                      Explore
+                    </button>
                   </div>
                 </div>
               </article>
