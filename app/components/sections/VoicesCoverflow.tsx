@@ -21,6 +21,14 @@ const POSITIONS = {
   zIndex:  [50,   40,   30,   20,    0],
 } as const;
 
+// Shortest circular distance — keeps all cards positioned on both sides of center
+function circularOffset(i: number, active: number, total: number): number {
+  let offset = i - active;
+  if (offset > total / 2) offset -= total;
+  if (offset < -total / 2) offset += total;
+  return offset;
+}
+
 function getProps(offset: number) {
   const abs = Math.min(Math.abs(offset), POSITIONS.x.length - 1);
   const sign = offset >= 0 ? 1 : -1;
@@ -80,7 +88,7 @@ export function VoicesCoverflow({ items }: VoicesCoverflowProps) {
       items.forEach((_, i) => {
         const el = cardRefs.current[i];
         if (!el) return;
-        const props = getProps(i - targetIndex);
+        const props = getProps(circularOffset(i, targetIndex, items.length));
         if (animate) {
           gsap.to(el, {
             x: props.x,
@@ -113,10 +121,10 @@ export function VoicesCoverflow({ items }: VoicesCoverflowProps) {
 
   const goTo = useCallback(
     (next: number) => {
-      const clamped = Math.max(0, Math.min(next, items.length - 1));
-      if (clamped === active) return;
-      setActive(clamped);
-      layoutCards(clamped, true);
+      const wrapped = ((next % items.length) + items.length) % items.length;
+      if (wrapped === active) return;
+      setActive(wrapped);
+      layoutCards(wrapped, true);
     },
     [active, items.length, layoutCards]
   );
@@ -130,9 +138,6 @@ export function VoicesCoverflow({ items }: VoicesCoverflowProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [active, goTo]);
 
-  const canPrev = active > 0;
-  const canNext = active < items.length - 1;
-
   return (
     <>
       {/* 3D Stage */}
@@ -142,7 +147,7 @@ export function VoicesCoverflow({ items }: VoicesCoverflowProps) {
         data-lenis-prevent
       >
         {items.map((item, i) => {
-          const offset = Math.abs(i - active);
+          const offset = Math.abs(circularOffset(i, active, items.length));
           const withinRange = offset <= 2;
 
           return (
@@ -178,8 +183,7 @@ export function VoicesCoverflow({ items }: VoicesCoverflowProps) {
       <div className="mt-10 flex items-center justify-center gap-6">
         <button
           onClick={() => goTo(active - 1)}
-          disabled={!canPrev}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-white text-black shadow-sm transition hover:bg-black hover:text-white disabled:pointer-events-none disabled:opacity-25"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-white text-black shadow-sm transition hover:bg-black hover:text-white"
           aria-label="Previous"
         >
           <ChevronLeft size={18} />
@@ -202,8 +206,7 @@ export function VoicesCoverflow({ items }: VoicesCoverflowProps) {
 
         <button
           onClick={() => goTo(active + 1)}
-          disabled={!canNext}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-white text-black shadow-sm transition hover:bg-black hover:text-white disabled:pointer-events-none disabled:opacity-25"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-white text-black shadow-sm transition hover:bg-black hover:text-white"
           aria-label="Next"
         >
           <ChevronRight size={18} />
