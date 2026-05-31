@@ -144,7 +144,6 @@ export function VoicesCoverflow({ items }: VoicesCoverflowProps) {
       <div
         className="relative h-[540px] md:h-[600px]"
         style={{ perspective: "1200px" }}
-        data-lenis-prevent
       >
         {items.map((item, i) => {
           const offset = Math.abs(circularOffset(i, active, items.length));
@@ -156,7 +155,7 @@ export function VoicesCoverflow({ items }: VoicesCoverflowProps) {
               ref={(el) => { cardRefs.current[i] = el; }}
               onClick={() => goTo(i)}
               className="absolute left-1/2 top-1/2 w-[220px] md:w-[270px] cursor-pointer"
-              style={{ willChange: "transform", transformOrigin: "center center" }}
+              style={{ willChange: "transform", transformOrigin: "center center", touchAction: "pan-y" }}
             >
               <article
                 className={`relative overflow-hidden rounded-[12px] shadow-lg transition-shadow duration-300 h-[380px] md:h-[470px] ${
