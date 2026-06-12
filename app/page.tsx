@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Footer } from "@/app/components/layout/Footer";
 import { Reveal, Parallax } from "@/app/components/ui/GsapReveal";
 import { LazyVideo } from "@/app/components/ui/LazyVideo";
@@ -229,15 +230,16 @@ export default function Home() {
             }}
           >
             {[
-              { name: "TETLA Classic",  model: "RTO Model", price: "45,999",  image: "/pa1.jpg", description: "Efficient, stylish, and built for city rides" },
-              { name: "TETLA E9 Pro",   model: "RTO Model", price: "62,999",  image: "/pa3.jpg", description: "Smart performance with premium comfort" },
-              { name: "TETLA Pro Plus", model: "Premium",   price: "78,999",  image: "/pa2.jpg", description: "Next-gen riding with advanced tech built in" },
-              { name: "TETLA Ailes",    model: "Sport",     price: "89,999",  image: "/pa4.jpg", description: "Built for speed, designed for the bold" },
-              { name: "TETLA Voiture",  model: "Elite",     price: "1,20,000", image: "/pa5.jpg", description: "The pinnacle of electric luxury on two wheels" },
+              { name: "TETLA Classic",  slug: "tetla-classic",  model: "RTO Model", price: "45,999",  image: "/pa1.jpg", description: "Efficient, stylish, and built for city rides" },
+              { name: "TETLA E9 Pro",   slug: "tetla-e9-pro",   model: "RTO Model", price: "62,999",  image: "/pa3.jpg", description: "Smart performance with premium comfort" },
+              { name: "TETLA Pro Plus", slug: "tetla-pro-plus", model: "Premium",   price: "78,999",  image: "/pa2.jpg", description: "Next-gen riding with advanced tech built in" },
+              { name: "TETLA Ailes",    slug: "tetla-ailes",    model: "Sport",     price: "89,999",  image: "/pa4.jpg", description: "Built for speed, designed for the bold" },
+              { name: "TETLA Voiture",  slug: "tetla-voiture",  model: "Elite",     price: "1,20,000", image: "/pa5.jpg", description: "The pinnacle of electric luxury on two wheels" },
             ].map((product) => (
-              <article
+              <Link
                 key={product.name}
-                className="relative flex-none w-[311px] h-[420px] overflow-hidden rounded-[12px] shadow-md snap-center cursor-pointer"
+                href={`/products/${product.slug}`}
+                className="relative block flex-none w-[311px] h-[420px] overflow-hidden rounded-[12px] shadow-md snap-center cursor-pointer"
               >
                 <Image
                   src={product.image}
@@ -272,12 +274,12 @@ export default function Home() {
                       <p className="text-[10px] text-gray-400">Starting from</p>
                       <p className="text-lg font-bold text-white">₹{product.price}</p>
                     </div>
-                    <button className="rounded-full border border-white/70 bg-transparent px-4 py-1.5 text-[11px] font-semibold text-white hover:bg-white hover:text-black transition">
+                    <span className="rounded-full border border-white/70 bg-transparent px-4 py-1.5 text-[11px] font-semibold text-white hover:bg-white hover:text-black transition">
                       Explore
-                    </button>
+                    </span>
                   </div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
           </div>
