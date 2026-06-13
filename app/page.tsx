@@ -391,45 +391,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* MEET THE FOUNDERS */}
-      <section id="ownership" className="bg-white py-20 text-black md:py-28">
-        <div className="mx-auto flex max-w-[1200px] flex-col gap-12 px-5 sm:px-6">
-          <Reveal>
-            <h2 className="text-center text-3xl font-semibold tracking-tight md:text-4xl">
-              Meet the Founders
-            </h2>
-          </Reveal>
-          <div className="grid gap-8 md:grid-cols-3">
-            {[
-              { src: "/ceo.png", name: "K T Davood", role: "CEO" },
-              { src: "/cmd.png", name: "Dr Ashraf C", role: "CMD" },
-              { src: "/cto.png", name: "David Haley", role: "CTO" },
-            ].map((person, idx) => (
-              <Reveal key={person.name} delay={idx * 0.1}>
-                <article className="flex flex-col gap-4">
-                  <div className="relative w-full aspect-[3/4] overflow-hidden rounded-[12px] bg-gray-100">
-                    <Parallax className="absolute inset-0 h-full w-full" scale={1.1}>
-                      <Image
-                        src={person.src}
-                        alt={person.name}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 400px"
-                        className="object-cover object-top"
-                        loading="lazy"
-                      />
-                    </Parallax>
-                  </div>
-                  <div className="text-left">
-                    <p className="text-lg font-bold text-black">{person.name}</p>
-                    <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">{person.role}</p>
-                  </div>
-                </article>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ENQUIRY FORM */}
       <section id="dealership" className="bg-[#030712] py-20 text-white md:py-28">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
