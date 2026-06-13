@@ -96,11 +96,11 @@ export function Frame360({ frames, className = "" }: Frame360Props) {
   useEffect(() => () => { glideTween.current?.kill(); }, []);
 
   return (
-    <div className={`flex flex-col items-center gap-6 ${className}`}>
+    <div className={`flex flex-col items-center justify-center gap-6 ${className}`}>
       {/* Viewer */}
       <div
         ref={wrapRef}
-        className={`relative w-full select-none ${
+        className={`relative w-full flex-1 min-h-0 flex items-center justify-center select-none ${
           ready ? "cursor-grab active:cursor-grabbing" : "cursor-wait"
         }`}
         style={{ touchAction: "pan-y" }}
@@ -113,23 +113,23 @@ export function Frame360({ frames, className = "" }: Frame360Props) {
         <img
           src={frames[frame]}
           alt={`360 view, angle ${Math.round((frame / frames.length) * 360)}°`}
-          className={`w-full max-h-[92vh] object-contain pointer-events-none transition-opacity duration-500 ${
+          className={`h-full w-full object-contain pointer-events-none transition-opacity duration-500 ${
             ready ? "opacity-100" : "opacity-40"
           }`}
           draggable={false}
           style={{
-            // Feather the frame's studio-grey edges so the bike dissolves into
-            // the hero background instead of sitting in a visible rectangle
+            // Feather the studio-grey edges so the bike dissolves into the
+            // dark background instead of sitting in a visible rectangle
             maskImage:
-              "radial-gradient(ellipse 90% 86% at 50% 47%, #000 55%, transparent 100%)",
+              "radial-gradient(ellipse 86% 84% at 50% 47%, #000 58%, transparent 100%)",
             WebkitMaskImage:
-              "radial-gradient(ellipse 90% 86% at 50% 47%, #000 55%, transparent 100%)",
+              "radial-gradient(ellipse 86% 84% at 50% 47%, #000 58%, transparent 100%)",
           }}
         />
 
         {/* Drag hint */}
         {ready && hintVisible && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2 text-black/45 text-xs tracking-widest uppercase pointer-events-none">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 text-white/40 text-xs tracking-widest uppercase pointer-events-none">
             <span className="text-base">←</span>
             <span>Drag to rotate</span>
             <span className="text-base">→</span>
@@ -138,21 +138,21 @@ export function Frame360({ frames, className = "" }: Frame360Props) {
       </div>
 
       {/* Angle indicator / load progress */}
-      <div className="relative w-48 h-px bg-black/15 overflow-visible">
+      <div className="relative w-48 h-px bg-white/15 overflow-visible shrink-0">
         {ready ? (
           <div
-            className="absolute top-1/2 -translate-y-1/2 h-[3px] w-8 rounded-full bg-black transition-none"
+            className="absolute top-1/2 -translate-y-1/2 h-[3px] w-8 rounded-full bg-white transition-none"
             style={{ left: `${(frame / frames.length) * (100 - 100 / 6)}%` }}
           />
         ) : (
           <div
-            className="absolute top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-black/50"
+            className="absolute top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-white/60"
             style={{ width: `${progress * 100}%` }}
           />
         )}
       </div>
       {!ready && (
-        <p className="text-[10px] uppercase tracking-[0.25em] text-black/30 -mt-3">
+        <p className="text-[10px] uppercase tracking-[0.25em] text-white/30 -mt-3">
           Loading {Math.round(progress * 100)}%
         </p>
       )}

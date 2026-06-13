@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/app/components/layout/Header";
 import { Footer } from "@/app/components/layout/Footer";
-import { ProductViewer360 } from "./ProductViewer360";
+import { Frame360 } from "./Frame360";
 import { HeroShowcase } from "./HeroShowcase";
 
 // ─── Static fallback data (used when DB row has no extras) ────────────────────
@@ -76,11 +76,6 @@ const PRODUCT_EXTRAS: Record<string, {
 // Default extras for products not yet in the map
 const DEFAULT_EXTRAS = PRODUCT_EXTRAS["tetla-classic"];
 
-const VIEWER_ANGLES = [
-  { src: "/3601.jpeg", label: "Side View" },
-  { src: "/3602.jpeg", label: "Front View" },
-];
-
 export default async function ProductPage({
   params,
 }: {
@@ -116,7 +111,7 @@ export default async function ProductPage({
     <div className="w-full overflow-x-hidden bg-[#030712] text-white">
       <Header />
 
-      {/* ── 1. HERO — animated, 3D mouse parallax ────────────────────────── */}
+      {/* ── 1. PREMIUM BANNER — full-screen dark cinematic ───────────────── */}
       <HeroShowcase
         name={product.name}
         model={specs.model ?? "RTO Model"}
@@ -128,24 +123,17 @@ export default async function ProductPage({
           { label: "Charge Time", value: extras.chargeTime },
           { label: "Top Speed", value: extras.topSpeed },
         ]}
-        frames={heroFrames}
       />
 
-      {/* ── 2. 360° TURNTABLE — video scrub when video_url is set ────────── */}
-      <section className="bg-black py-24 md:py-32">
-        <div className="max-w-[1200px] mx-auto px-5 sm:px-6">
-          <div className="mb-14 text-center">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-white/30 mb-3">Interactive</p>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Explore Every Angle</h2>
-            <p className="mt-3 text-sm text-white/40">Drag left or right to rotate the bike</p>
-          </div>
-          {/* /3dvideo.mp4 is the placeholder turntable — a per-product video
-              uploaded via the admin panel (video_url) takes priority */}
-          <ProductViewer360
-            angles={VIEWER_ANGLES}
-            videoUrl={product.videoUrl ?? "/3dvideo.mp4"}
-            frames={frames}
-          />
+      {/* ── 2. FULL-SCREEN 360° TURNTABLE ────────────────────────────────── */}
+      <section className="relative h-screen w-full bg-black flex flex-col">
+        <div className="pt-24 md:pt-28 text-center shrink-0">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-white/30 mb-3">Interactive</p>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Explore Every Angle</h2>
+          <p className="mt-3 text-sm text-white/40">Drag left or right to rotate</p>
+        </div>
+        <div className="flex-1 min-h-0 flex items-center justify-center px-5">
+          <Frame360 frames={heroFrames} className="h-full w-full max-w-[1100px]" />
         </div>
       </section>
 
