@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { db, leads } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -10,23 +10,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
-    const supabase = await createClient();
-    const { error } = await supabase.from("leads").insert({
+    await db.insert(leads).values({
       name,
       email,
       phone,
-      enquiry_type,
+      enquiryType: enquiry_type,
       message,
       newsletter: !!newsletter,
       status: "new",
     });
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
     return NextResponse.json({ success: true }, { status: 200 });
   } catch {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request" }, { status: 500 });
   }
 }

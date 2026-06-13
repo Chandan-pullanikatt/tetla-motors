@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 
 type Blog = {
@@ -10,8 +9,8 @@ type Blog = {
   title: string;
   slug: string;
   author: string;
-  is_published: boolean;
-  created_at: string;
+  isPublished: boolean;
+  createdAt: string;
 };
 
 export default function BlogsPage() {
@@ -20,12 +19,8 @@ export default function BlogsPage() {
 
   const load = async () => {
     setLoading(true);
-    const supabase = createClient();
-    const { data } = await supabase
-      .from("blogs")
-      .select("id, title, slug, author, is_published, created_at")
-      .order("created_at", { ascending: false });
-    setBlogs(data ?? []);
+    const res = await fetch("/api/admin/blogs");
+    setBlogs(res.ok ? await res.json() : []);
     setLoading(false);
   };
 
@@ -33,17 +28,19 @@ export default function BlogsPage() {
 
   const deleteBlog = async (id: string) => {
     if (!confirm("Delete this blog post?")) return;
-    const supabase = createClient();
-    await supabase.from("blogs").delete().eq("id", id);
+    await fetch(`/api/admin/blogs/${id}`, { method: "DELETE" });
     setBlogs((prev) => prev.filter((b) => b.id !== id));
   };
 
   const togglePublish = async (blog: Blog) => {
-    const supabase = createClient();
-    await supabase.from("blogs").update({
-      is_published: !blog.is_published,
-      published_at: !blog.is_published ? new Date().toISOString() : null,
-    }).eq("id", blog.id);
+    await fetch(`/api/admin/blogs/${blog.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        isPublished: !blog.isPublished,
+        publishedAt: !blog.isPublished ? new Date() : null,
+      }),
+    });
     await load();
   };
 
@@ -85,16 +82,16 @@ export default function BlogsPage() {
                       <button
                         onClick={() => togglePublish(blog)}
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors ${
-                          blog.is_published
+                          blog.isPublished
                             ? "bg-green-50 text-green-700 hover:bg-green-100"
                             : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                         }`}
                       >
-                        {blog.is_published ? "Published" : "Draft"}
+                        {blog.isPublished ? "Published" : "Draft"}
                       </button>
                     </td>
                     <td className="px-5 py-3 text-gray-400">
-                      {new Date(blog.created_at).toLocaleDateString()}
+                      {new Date(blog.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-2">

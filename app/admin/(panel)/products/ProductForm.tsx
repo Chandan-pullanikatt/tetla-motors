@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { VideoUpload } from "@/app/components/ui/VideoUpload";
 import { Plus, X } from "lucide-react";
 
@@ -66,22 +65,29 @@ export function ProductForm({ initial }: { initial?: Partial<ProductData> }) {
   };
 
   const handleImageUpload = async (i: number, file: File) => {
-    const supabase = createClient();
-    const ext = file.name.split(".").pop();
-    const path = `products/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage
-      .from("images")
-      .upload(path, file, { upsert: true });
-    if (error) return;
-    const { data: { publicUrl } } = supabase.storage.from("images").getPublicUrl(path);
-    setImage(i, publicUrl);
+    // Unsigned Cloudinary upload (same preset as video uploads)
+    const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+    if (!cloud || !preset) {
+      setError("Cloudinary is not configured.");
+      return;
+    }
+    const body = new FormData();
+    body.append("file", file);
+    body.append("upload_preset", preset);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud}/image/upload`, {
+      method: "POST",
+      body,
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.secure_url) setImage(i, data.secure_url);
   };
 
   const save = async () => {
     setSaving(true);
     setError("");
 
-    const supabase = createClient();
     const specsObj = Object.fromEntries(
       form.specs.filter((s) => s.key).map((s) => [s.key, s.value])
     );
@@ -89,25 +95,31 @@ export function ProductForm({ initial }: { initial?: Partial<ProductData> }) {
     const payload = {
       name: form.name,
       slug: form.slug,
-      price: Number(form.price),
+      price: String(form.price || 0),
       description: form.description,
       category: form.category,
-      is_active: form.is_active,
+      isActive: form.is_active,
       images,
       specs: specsObj,
-      video_url: form.video_url || null,
-      video_public_id: form.video_public_id || null,
+      videoUrl: form.video_url || null,
+      videoPublicId: form.video_public_id || null,
     };
 
-    let err;
-    if (initial?.id) {
-      ({ error: err } = await supabase.from("products").update(payload).eq("id", initial.id));
-    } else {
-      ({ error: err } = await supabase.from("products").insert(payload));
-    }
+    const res = initial?.id
+      ? await fetch(`/api/admin/products/${initial.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+      : await fetch("/api/admin/products", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-    if (err) {
-      setError(err.message);
+    if (!res.ok) {
+      const { error: err } = await res.json().catch(() => ({ error: "Save failed" }));
+      setError(err ?? "Save failed");
       setSaving(false);
       return;
     }

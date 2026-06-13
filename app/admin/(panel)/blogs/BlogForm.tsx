@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 
 type BlogData = {
   id?: string;
@@ -43,40 +42,54 @@ export function BlogForm({ initial }: { initial?: Partial<BlogData> }) {
   };
 
   const handleCoverUpload = async (file: File) => {
-    const supabase = createClient();
-    const ext = file.name.split(".").pop();
-    const path = `blogs/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("images").upload(path, file, { upsert: true });
-    if (error) return;
-    const { data: { publicUrl } } = supabase.storage.from("images").getPublicUrl(path);
-    set("cover_image", publicUrl);
+    const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+    if (!cloud || !preset) {
+      setError("Cloudinary is not configured.");
+      return;
+    }
+    const body = new FormData();
+    body.append("file", file);
+    body.append("upload_preset", preset);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud}/image/upload`, {
+      method: "POST",
+      body,
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.secure_url) set("cover_image", data.secure_url);
   };
 
   const save = async () => {
     setSaving(true);
     setError("");
 
-    const supabase = createClient();
     const payload = {
       title: form.title,
       slug: form.slug,
       excerpt: form.excerpt,
       content: form.content,
-      cover_image: form.cover_image,
+      coverImage: form.cover_image,
       author: form.author,
-      is_published: form.is_published,
-      published_at: form.is_published ? new Date().toISOString() : null,
+      isPublished: form.is_published,
+      publishedAt: form.is_published ? new Date() : null,
     };
 
-    let err;
-    if (initial?.id) {
-      ({ error: err } = await supabase.from("blogs").update(payload).eq("id", initial.id));
-    } else {
-      ({ error: err } = await supabase.from("blogs").insert(payload));
-    }
+    const res = initial?.id
+      ? await fetch(`/api/admin/blogs/${initial.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+      : await fetch("/api/admin/blogs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-    if (err) {
-      setError(err.message);
+    if (!res.ok) {
+      const { error: err } = await res.json().catch(() => ({ error: "Save failed" }));
+      setError(err ?? "Save failed");
       setSaving(false);
       return;
     }

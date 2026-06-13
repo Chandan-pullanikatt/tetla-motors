@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 type HeroContent = {
   id: string;
   headline: string;
   subheadline: string;
-  stat1_label: string;
-  stat1_value: string;
-  stat2_label: string;
-  stat2_value: string;
+  stat1Label: string;
+  stat1Value: string;
+  stat2Label: string;
+  stat2Value: string;
 };
 
 const INPUT =
@@ -24,9 +23,8 @@ export default function HeroPage() {
 
   useEffect(() => {
     const load = async () => {
-      const supabase = createClient();
-      const { data } = await supabase.from("hero_content").select("*").single();
-      setHero(data);
+      const res = await fetch("/api/admin/hero");
+      setHero(res.ok ? await res.json() : null);
       setLoading(false);
     };
     load();
@@ -39,19 +37,18 @@ export default function HeroPage() {
     if (!hero) return;
     setSaving(true);
     setSaved(false);
-    const supabase = createClient();
-    await supabase
-      .from("hero_content")
-      .update({
+    await fetch("/api/admin/hero", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         headline: hero.headline,
         subheadline: hero.subheadline,
-        stat1_label: hero.stat1_label,
-        stat1_value: hero.stat1_value,
-        stat2_label: hero.stat2_label,
-        stat2_value: hero.stat2_value,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", hero.id);
+        stat1Label: hero.stat1Label,
+        stat1Value: hero.stat1Value,
+        stat2Label: hero.stat2Label,
+        stat2Value: hero.stat2Value,
+      }),
+    });
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -87,19 +84,19 @@ export default function HeroPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">Stat 1 Label</label>
-                  <input className={INPUT} value={hero.stat1_label} onChange={(e) => set("stat1_label", e.target.value)} placeholder="Electric Range" />
+                  <input className={INPUT} value={hero.stat1Label} onChange={(e) => set("stat1Label", e.target.value)} placeholder="Electric Range" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">Stat 1 Value</label>
-                  <input className={INPUT} value={hero.stat1_value} onChange={(e) => set("stat1_value", e.target.value)} placeholder="Up to 100 Km" />
+                  <input className={INPUT} value={hero.stat1Value} onChange={(e) => set("stat1Value", e.target.value)} placeholder="Up to 100 Km" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">Stat 2 Label</label>
-                  <input className={INPUT} value={hero.stat2_label} onChange={(e) => set("stat2_label", e.target.value)} placeholder="Full Charge" />
+                  <input className={INPUT} value={hero.stat2Label} onChange={(e) => set("stat2Label", e.target.value)} placeholder="Full Charge" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">Stat 2 Value</label>
-                  <input className={INPUT} value={hero.stat2_value} onChange={(e) => set("stat2_value", e.target.value)} placeholder="2 to 4 Hrs" />
+                  <input className={INPUT} value={hero.stat2Value} onChange={(e) => set("stat2Value", e.target.value)} placeholder="2 to 4 Hrs" />
                 </div>
               </div>
             </div>
@@ -111,13 +108,13 @@ export default function HeroPage() {
               <p className="mt-1 text-sm text-gray-300">{hero.subheadline || "—"}</p>
               <div className="mt-4 flex items-center gap-6">
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-400">{hero.stat1_label}</p>
-                  <p className="text-lg font-bold">{hero.stat1_value}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-gray-400">{hero.stat1Label}</p>
+                  <p className="text-lg font-bold">{hero.stat1Value}</p>
                 </div>
                 <div className="h-8 w-px bg-white/20" />
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-gray-400">{hero.stat2_label}</p>
-                  <p className="text-lg font-bold">{hero.stat2_value}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-gray-400">{hero.stat2Label}</p>
+                  <p className="text-lg font-bold">{hero.stat2Value}</p>
                 </div>
               </div>
             </div>

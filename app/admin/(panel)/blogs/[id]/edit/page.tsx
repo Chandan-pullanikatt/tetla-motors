@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { BlogForm } from "../../BlogForm";
 
 export default function EditBlogPage() {
@@ -12,9 +11,20 @@ export default function EditBlogPage() {
 
   useEffect(() => {
     const load = async () => {
-      const supabase = createClient();
-      const { data } = await supabase.from("blogs").select("*").eq("id", id).single();
-      setBlog(data);
+      const res = await fetch(`/api/admin/blogs/${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setBlog({
+          id: data.id,
+          title: data.title,
+          slug: data.slug,
+          excerpt: data.excerpt ?? "",
+          content: data.content ?? "",
+          cover_image: data.coverImage ?? "",
+          author: data.author ?? "TETLA Team",
+          is_published: data.isPublished,
+        });
+      }
       setLoading(false);
     };
     load();

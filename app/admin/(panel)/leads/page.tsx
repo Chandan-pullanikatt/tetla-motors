@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useEffect, useState, useCallback } from "react";
 import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 
 type Lead = {
@@ -9,12 +8,12 @@ type Lead = {
   name: string;
   email: string;
   phone: string;
-  enquiry_type: string;
+  enquiryType: string;
   message: string;
   newsletter: boolean;
   status: string;
   notes: string;
-  created_at: string;
+  createdAt: string;
 };
 
 const STATUSES = ["all", "new", "contacted", "closed"];
@@ -33,17 +32,15 @@ export default function LeadsPage() {
   const [loading, setLoading] = useState(true);
   const [editState, setEditState] = useState<Record<string, { status: string; notes: string }>>({});
 
-  const loadLeads = async () => {
+  const loadLeads = useCallback(async () => {
     setLoading(true);
-    const supabase = createClient();
-    let q = supabase.from("leads").select("*").order("created_at", { ascending: false });
-    if (filter !== "all") q = q.eq("status", filter);
-    const { data } = await q;
-    setLeads(data ?? []);
+    const res = await fetch("/api/admin/leads");
+    const all: Lead[] = res.ok ? await res.json() : [];
+    setLeads(filter === "all" ? all : all.filter((l) => l.status === filter));
     setLoading(false);
-  };
+  }, [filter]);
 
-  useEffect(() => { loadLeads(); }, [filter]);
+  useEffect(() => { loadLeads(); }, [loadLeads]);
 
   const toggle = (id: string, lead: Lead) => {
     if (expandedId === id) {
@@ -59,17 +56,19 @@ export default function LeadsPage() {
 
   const saveEdit = async (id: string) => {
     setSaving(id);
-    const supabase = createClient();
     const { status, notes } = editState[id];
-    await supabase.from("leads").update({ status, notes }).eq("id", id);
+    await fetch(`/api/admin/leads/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status, notes }),
+    });
     await loadLeads();
     setSaving(null);
   };
 
   const deleteLead = async (id: string) => {
     if (!confirm("Delete this lead?")) return;
-    const supabase = createClient();
-    await supabase.from("leads").delete().eq("id", id);
+    await fetch(`/api/admin/leads/${id}`, { method: "DELETE" });
     setLeads((prev) => prev.filter((l) => l.id !== id));
     if (expandedId === id) setExpandedId(null);
   };
@@ -134,12 +133,12 @@ export default function LeadsPage() {
                         onClick={() => toggle(lead.id, lead)}
                       >
                         <td className="px-5 py-3 text-gray-400 whitespace-nowrap">
-                          {new Date(lead.created_at).toLocaleDateString()}
+                          {new Date(lead.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-5 py-3 font-medium text-gray-900">{lead.name}</td>
                         <td className="px-5 py-3 text-gray-500">{lead.phone || "—"}</td>
                         <td className="px-5 py-3 text-gray-500">{lead.email || "—"}</td>
-                        <td className="px-5 py-3 text-gray-500">{lead.enquiry_type || "—"}</td>
+                        <td className="px-5 py-3 text-gray-500">{lead.enquiryType || "—"}</td>
                         <td className="px-5 py-3">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${statusColors[lead.status] ?? "bg-gray-100 text-gray-600"}`}>
                             {lead.status}

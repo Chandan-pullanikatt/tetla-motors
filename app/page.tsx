@@ -6,7 +6,6 @@ import Link from "next/link";
 import { Footer } from "@/app/components/layout/Footer";
 import { Reveal, Parallax } from "@/app/components/ui/GsapReveal";
 import { LazyVideo } from "@/app/components/ui/LazyVideo";
-import { createClient } from "@/lib/supabase/client";
 import { VoicesCoverflow } from "@/app/components/sections/VoicesCoverflow";
 
 const faqs = [
@@ -99,12 +98,14 @@ export default function Home() {
 
   useEffect(() => {
     const loadVideos = async () => {
-      const supabase = createClient();
-      const { data } = await supabase.from("site_videos").select("key, url");
-      if (!data) return;
-      const map: Record<string, string> = { ...VIDEO_DEFAULTS };
-      data.forEach(({ key, url }) => { if (url) map[key] = url; });
-      setVideos(map);
+      try {
+        const res = await fetch("/api/videos");
+        if (!res.ok) return;
+        const data: Record<string, string> = await res.json();
+        setVideos({ ...VIDEO_DEFAULTS, ...data });
+      } catch {
+        // keep defaults
+      }
     };
     loadVideos();
   }, []);

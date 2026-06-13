@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { getProductBySlug } from "@/lib/db/queries";
 import { notFound } from "next/navigation";
 import fs from "fs";
 import path from "path";
@@ -88,13 +88,7 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
 
-  const supabase = await createClient();
-  const { data: product } = await supabase
-    .from("products")
-    .select("*")
-    .eq("slug", slug)
-    .eq("is_active", true)
-    .single();
+  const product = await getProductBySlug(slug);
 
   if (!product) notFound();
 
@@ -149,7 +143,7 @@ export default async function ProductPage({
               uploaded via the admin panel (video_url) takes priority */}
           <ProductViewer360
             angles={VIEWER_ANGLES}
-            videoUrl={product.video_url ?? "/3dvideo.mp4"}
+            videoUrl={product.videoUrl ?? "/3dvideo.mp4"}
             frames={frames}
           />
         </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Users, Package, BookOpen, Inbox } from "lucide-react";
 
 type Lead = {
@@ -9,9 +8,9 @@ type Lead = {
   name: string;
   email: string;
   phone: string;
-  enquiry_type: string;
+  enquiryType: string;
   status: string;
-  created_at: string;
+  createdAt: string;
 };
 
 const statusColors: Record<string, string> = {
@@ -32,29 +31,22 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const load = async () => {
-      const supabase = createClient();
-
-      const [
-        { count: totalLeads },
-        { count: newLeads },
-        { count: products },
-        { count: blogs },
-        { data: leads },
-      ] = await Promise.all([
-        supabase.from("leads").select("*", { count: "exact", head: true }),
-        supabase.from("leads").select("*", { count: "exact", head: true }).eq("status", "new"),
-        supabase.from("products").select("*", { count: "exact", head: true }),
-        supabase.from("blogs").select("*", { count: "exact", head: true }).eq("is_published", true),
-        supabase.from("leads").select("*").order("created_at", { ascending: false }).limit(5),
+      const [leadsRes, productsRes, blogsRes] = await Promise.all([
+        fetch("/api/admin/leads"),
+        fetch("/api/admin/products"),
+        fetch("/api/admin/blogs"),
       ]);
+      const leads: Lead[] = leadsRes.ok ? await leadsRes.json() : [];
+      const products: unknown[] = productsRes.ok ? await productsRes.json() : [];
+      const blogs: { isPublished: boolean }[] = blogsRes.ok ? await blogsRes.json() : [];
 
       setStats({
-        totalLeads: totalLeads ?? 0,
-        newLeads: newLeads ?? 0,
-        products: products ?? 0,
-        blogs: blogs ?? 0,
+        totalLeads: leads.length,
+        newLeads: leads.filter((l) => l.status === "new").length,
+        products: products.length,
+        blogs: blogs.filter((b) => b.isPublished).length,
       });
-      setRecentLeads(leads ?? []);
+      setRecentLeads(leads.slice(0, 5));
       setLoading(false);
     };
 
@@ -118,14 +110,14 @@ export default function DashboardPage() {
                   <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-5 py-3 font-medium text-gray-900">{lead.name}</td>
                     <td className="px-5 py-3 text-gray-500">{lead.phone || "—"}</td>
-                    <td className="px-5 py-3 text-gray-500">{lead.enquiry_type || "—"}</td>
+                    <td className="px-5 py-3 text-gray-500">{lead.enquiryType || "—"}</td>
                     <td className="px-5 py-3">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[lead.status] ?? "bg-gray-100 text-gray-600"}`}>
                         {lead.status}
                       </span>
                     </td>
                     <td className="px-5 py-3 text-gray-400">
-                      {new Date(lead.created_at).toLocaleDateString()}
+                      {new Date(lead.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
                 ))}

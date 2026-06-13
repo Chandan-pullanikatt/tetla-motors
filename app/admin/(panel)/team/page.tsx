@@ -2,28 +2,27 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/client";
 import { Plus, Pencil, Trash2, Check, X } from "lucide-react";
 
 type Member = {
   id: string;
   name: string;
   role: string;
-  image_url: string;
-  display_order: number;
+  imageUrl: string;
+  displayOrder: number;
 };
 
 type FormState = {
   name: string;
   role: string;
-  image_url: string;
-  display_order: number;
+  imageUrl: string;
+  displayOrder: number;
 };
 
 const INPUT =
   "h-10 w-full rounded-lg border border-gray-200 px-3 text-sm text-gray-800 outline-none focus:border-gray-400 transition-colors";
 
-const empty: FormState = { name: "", role: "", image_url: "", display_order: 0 };
+const empty: FormState = { name: "", role: "", imageUrl: "", displayOrder: 0 };
 
 export default function TeamPage() {
   const [members, setMembers] = useState<Member[]>([]);
@@ -34,12 +33,8 @@ export default function TeamPage() {
 
   const load = async () => {
     setLoading(true);
-    const supabase = createClient();
-    const { data } = await supabase
-      .from("team_members")
-      .select("*")
-      .order("display_order", { ascending: true });
-    setMembers(data ?? []);
+    const res = await fetch("/api/admin/team");
+    setMembers(res.ok ? await res.json() : []);
     setLoading(false);
   };
 
@@ -50,31 +45,41 @@ export default function TeamPage() {
     setForm({
       name: member.name,
       role: member.role,
-      image_url: member.image_url ?? "",
-      display_order: member.display_order,
+      imageUrl: member.imageUrl ?? "",
+      displayOrder: member.displayOrder,
     });
   };
 
   const handleImageUpload = async (file: File) => {
-    const supabase = createClient();
-    const ext = file.name.split(".").pop();
-    const path = `team/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("images").upload(path, file, { upsert: true });
-    if (error) return;
-    const { data: { publicUrl } } = supabase.storage.from("images").getPublicUrl(path);
-    setForm((p) => ({ ...p, image_url: publicUrl }));
+    const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+    if (!cloud || !preset) return;
+    const body = new FormData();
+    body.append("file", file);
+    body.append("upload_preset", preset);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud}/image/upload`, {
+      method: "POST",
+      body,
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.secure_url) setForm((p) => ({ ...p, imageUrl: data.secure_url }));
   };
 
   const save = async () => {
     setSaving(true);
-    const supabase = createClient();
     if (editId === "new") {
-      await supabase.from("team_members").insert({
-        ...form,
-        display_order: members.length,
+      await fetch("/api/admin/team", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, displayOrder: members.length }),
       });
     } else {
-      await supabase.from("team_members").update(form).eq("id", editId);
+      await fetch(`/api/admin/team/${editId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
     }
     setEditId(null);
     setForm(empty);
@@ -84,8 +89,7 @@ export default function TeamPage() {
 
   const remove = async (id: string) => {
     if (!confirm("Remove this team member?")) return;
-    const supabase = createClient();
-    await supabase.from("team_members").delete().eq("id", id);
+    await fetch(`/api/admin/team/${id}`, { method: "DELETE" });
     setMembers((prev) => prev.filter((m) => m.id !== id));
   };
 
@@ -106,8 +110,8 @@ export default function TeamPage() {
         <div className="flex gap-2">
           <input
             className={`${INPUT} flex-1`}
-            value={form.image_url}
-            onChange={(e) => setForm((p) => ({ ...p, image_url: e.target.value }))}
+            value={form.imageUrl}
+            onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))}
             placeholder="https://… or upload"
           />
           <label className="shrink-0 cursor-pointer h-10 px-3 flex items-center rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50 bg-white transition-colors">
@@ -118,7 +122,7 @@ export default function TeamPage() {
       </div>
       <div>
         <label className="block text-xs font-medium text-gray-500 mb-1">Display Order</label>
-        <input type="number" className={`${INPUT} w-24`} value={form.display_order} onChange={(e) => setForm((p) => ({ ...p, display_order: Number(e.target.value) }))} />
+        <input type="number" className={`${INPUT} w-24`} value={form.displayOrder} onChange={(e) => setForm((p) => ({ ...p, displayOrder: Number(e.target.value) }))} />
       </div>
       <div className="flex gap-2 pt-1">
         <button onClick={save} disabled={saving} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-black text-white text-sm font-medium hover:bg-gray-800 disabled:opacity-50 transition-colors">
@@ -161,8 +165,8 @@ export default function TeamPage() {
                 ) : (
                   <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
                     <div className="relative h-48 bg-gray-100">
-                      {m.image_url ? (
-                        <Image src={m.image_url} alt={m.name} fill className="object-cover object-top" />
+                      {m.imageUrl ? (
+                        <Image src={m.imageUrl} alt={m.name} fill className="object-cover object-top" />
                       ) : (
                         <div className="h-full flex items-center justify-center text-gray-300 text-4xl font-bold">
                           {m.name[0]}

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 
 type Product = {
@@ -11,8 +10,8 @@ type Product = {
   slug: string;
   price: number;
   category: string;
-  is_active: boolean;
-  created_at: string;
+  isActive: boolean;
+  createdAt: string;
 };
 
 export default function ProductsPage() {
@@ -21,12 +20,8 @@ export default function ProductsPage() {
 
   const load = async () => {
     setLoading(true);
-    const supabase = createClient();
-    const { data } = await supabase
-      .from("products")
-      .select("id, name, slug, price, category, is_active, created_at")
-      .order("created_at", { ascending: false });
-    setProducts(data ?? []);
+    const res = await fetch("/api/admin/products");
+    setProducts(res.ok ? await res.json() : []);
     setLoading(false);
   };
 
@@ -34,8 +29,7 @@ export default function ProductsPage() {
 
   const deleteProduct = async (id: string) => {
     if (!confirm("Delete this product?")) return;
-    const supabase = createClient();
-    await supabase.from("products").delete().eq("id", id);
+    await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
     setProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
@@ -75,8 +69,8 @@ export default function ProductsPage() {
                     <td className="px-5 py-3 text-gray-500 capitalize">{p.category}</td>
                     <td className="px-5 py-3 text-gray-700">₹{Number(p.price).toLocaleString("en-IN")}</td>
                     <td className="px-5 py-3">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${p.is_active ? "bg-green-50 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-                        {p.is_active ? "Active" : "Inactive"}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${p.isActive ? "bg-green-50 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                        {p.isActive ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td className="px-5 py-3">

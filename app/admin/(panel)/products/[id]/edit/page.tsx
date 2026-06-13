@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { ProductForm } from "../../ProductForm";
 
 export default function EditProductPage() {
@@ -12,14 +11,26 @@ export default function EditProductPage() {
 
   useEffect(() => {
     const load = async () => {
-      const supabase = createClient();
-      const { data } = await supabase.from("products").select("*").eq("id", id).single();
-      if (data) {
+      const res = await fetch(`/api/admin/products/${id}`);
+      if (res.ok) {
+        const data = await res.json();
         const specs = Object.entries(data.specs ?? {}).map(([key, value]) => ({
           key,
           value: String(value),
         }));
-        setProduct({ ...data, price: String(data.price), specs: specs.length ? specs : [{ key: "", value: "" }] });
+        setProduct({
+          id: data.id,
+          name: data.name,
+          slug: data.slug,
+          price: String(data.price),
+          description: data.description ?? "",
+          category: data.category ?? "bike",
+          is_active: data.isActive,
+          images: (data.images?.length ? data.images : [""]),
+          specs: specs.length ? specs : [{ key: "", value: "" }],
+          video_url: data.videoUrl ?? "",
+          video_public_id: data.videoPublicId ?? "",
+        });
       }
       setLoading(false);
     };

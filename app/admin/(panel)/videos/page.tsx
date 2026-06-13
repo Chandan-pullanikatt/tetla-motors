@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { VideoUpload } from "@/app/components/ui/VideoUpload";
 
 type VideoSlot = {
@@ -9,7 +8,7 @@ type VideoSlot = {
   key: string;
   label: string;
   url: string | null;
-  public_id: string | null;
+  publicId: string | null;
 };
 
 export default function VideosPage() {
@@ -20,29 +19,25 @@ export default function VideosPage() {
 
   useEffect(() => {
     const load = async () => {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("site_videos")
-        .select("*")
-        .order("key");
-      setSlots(data ?? []);
+      const res = await fetch("/api/admin/videos");
+      setSlots(res.ok ? await res.json() : []);
       setLoading(false);
     };
     load();
   }, []);
 
-  const handleChange = async (id: string, url: string, public_id: string) => {
+  const handleChange = async (id: string, url: string, publicId: string) => {
     setSaving(id);
     setSaved(null);
 
-    const supabase = createClient();
-    await supabase
-      .from("site_videos")
-      .update({ url, public_id, updated_at: new Date().toISOString() })
-      .eq("id", id);
+    await fetch(`/api/admin/videos/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url, publicId }),
+    });
 
     setSlots((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, url, public_id } : s))
+      prev.map((s) => (s.id === id ? { ...s, url, publicId } : s))
     );
 
     setSaving(null);
@@ -52,13 +47,13 @@ export default function VideosPage() {
 
   const handleClear = async (id: string) => {
     if (!confirm("Remove this video?")) return;
-    const supabase = createClient();
-    await supabase
-      .from("site_videos")
-      .update({ url: null, public_id: null })
-      .eq("id", id);
+    await fetch(`/api/admin/videos/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: null, publicId: null }),
+    });
     setSlots((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, url: null, public_id: null } : s))
+      prev.map((s) => (s.id === id ? { ...s, url: null, publicId: null } : s))
     );
   };
 
@@ -112,7 +107,7 @@ export default function VideosPage() {
 
                       <VideoUpload
                         value={slot.url ?? ""}
-                        publicId={slot.public_id ?? ""}
+                        publicId={slot.publicId ?? ""}
                         onChange={(url, publicId) => handleChange(slot.id, url, publicId)}
                         onClear={() => handleClear(slot.id)}
                       />
