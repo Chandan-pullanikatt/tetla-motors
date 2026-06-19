@@ -100,7 +100,7 @@ export function FeatureCoverflow({ features }: Props) {
   return (
     <div className="relative">
       {/* Stage — side cards peek beyond it and are clipped by the section's overflow-hidden */}
-      <div ref={stageRef} className="relative h-[220px]" data-lenis-prevent>
+      <div ref={stageRef} className="relative h-[220px]">
         {features.map((f, i) => (
           <div
             key={i}
@@ -134,14 +134,14 @@ export function FeatureCoverflow({ features }: Props) {
           <div className="relative w-[min(836px,88vw)]">
             <button
               onClick={() => goTo(active - 1)}
-              className="pointer-events-auto absolute left-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition hover:bg-white hover:text-black"
+              className="pointer-events-auto absolute left-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white transition hover:bg-white hover:text-black"
               aria-label="Previous"
             >
               <ChevronLeft size={18} />
             </button>
             <button
               onClick={() => goTo(active + 1)}
-              className="pointer-events-auto absolute right-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition hover:bg-white hover:text-black"
+              className="pointer-events-auto absolute right-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white transition hover:bg-white hover:text-black"
               aria-label="Next"
             >
               <ChevronRight size={18} />
