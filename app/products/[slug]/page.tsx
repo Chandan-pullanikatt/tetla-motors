@@ -115,12 +115,12 @@ export default async function ProductPage({
       {/* ── 4. FEATURE BENTO ─────────────────────────────────────────────── */}
       <section className="bg-white pt-16 md:pt-[100px] pb-16 md:pb-[100px]">
         <div className="px-5 sm:px-8 md:px-12 lg:px-20">
-          {/* Figma block: 1280×904 — left 480, right 768, gap 32; right rows 370/500 */}
-          <div className="grid grid-cols-1 gap-4 md:gap-6 lg:gap-8 lg:grid-cols-[480fr_768fr] lg:grid-rows-[370fr_500fr] lg:aspect-[1280/904]">
-            {/* Card 1 — tall left (480×904) */}
+          {/* Figma block: 1280×600 — left 480, right 768, gap 32; right rows 370/500 */}
+          <div className="grid grid-cols-1 gap-4 md:gap-6 lg:gap-8 lg:grid-cols-[480fr_768fr] lg:grid-rows-[370fr_500fr] lg:aspect-[1280/600]">
+            {/* Card 1 — tall left (480×600) */}
             <BentoCard
               f={c.features[0]}
-              className="aspect-[480/904] lg:aspect-auto lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:h-full"
+              className="aspect-[480/600] lg:aspect-auto lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:h-full"
             />
             {/* Card 2 — Bold Urban Design, top right full width (768×370) */}
             <BentoCard
