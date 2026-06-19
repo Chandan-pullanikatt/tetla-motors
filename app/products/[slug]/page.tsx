@@ -1,80 +1,37 @@
 import { getProductBySlug } from "@/lib/db/queries";
 import { notFound } from "next/navigation";
-import fs from "fs";
-import path from "path";
 import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/app/components/layout/Header";
 import { Footer } from "@/app/components/layout/Footer";
-import { Frame360 } from "./Frame360";
 import { HeroShowcase } from "./HeroShowcase";
+import { FeatureCoverflow } from "./FeatureCoverflow";
+import { HighlightText } from "./HighlightText";
+import type { ProductPageContent } from "@/lib/db/schema";
 
-// ─── Static fallback data (used when DB row has no extras) ────────────────────
-const PRODUCT_EXTRAS: Record<string, {
-  tagline: string;
-  range: string;
-  chargeTime: string;
-  topSpeed: string;
-  motorPower: string;
-  features: { title: string; desc: string }[];
-  fullSpecs: { label: string; value: string }[];
-}> = {
-  "tetla-classic": {
+// Fallback content for products that have no page_content yet
+function fallbackContent(name: string): ProductPageContent {
+  return {
     tagline: "Efficient, stylish, and built for city rides",
-    range: "Up to 100 Km",
-    chargeTime: "2 to 4 Hrs",
-    topSpeed: "60 Km/h",
-    motorPower: "1500W",
+    hero: { type: "video", url: "/v1.mp4" },
+    description:
+      "Experience effortless electric mobility with the TETLA Classic. Combining timeless **design**, **smart technology**, and zero-emission performance, it's built for drivers who want **sustainability** without compromising **style**.",
+    stats: {
+      range: "100 KM",
+      fullCharge: "4 Hour",
+      topSpeed: "100 KM",
+      runningCost: "₹0.15/km",
+      batteryWarranty: "4 Year",
+    },
+    showcaseImage: "/3601.jpeg",
     features: [
-      { title: "Smart LED Lighting", desc: "Ultra-bright adaptive LED headlamps for all road and visibility conditions" },
-      { title: "Digital Instrument Cluster", desc: "Full-colour TFT display showing speed, battery level, and trip data in real time" },
-      { title: "Regenerative Braking", desc: "Converts deceleration energy back into charge — every stop extends your range" },
+      { image: "/pa4.jpg", title: "Built for Daily Commutes", description: "Reliable electric mobility designed for work, shopping, and everyday travel without the fuel costs" },
+      { image: "/pa2.jpg", title: "Bold Urban Design", description: "Sporty body lines, premium finishes, and vibrant colors create a design that stands out on every ride" },
+      { image: "/pa3.jpg", title: "Modern LED", description: "Sharp LED headlamps provide better visibility" },
+      { image: "/pa5.jpg", title: "Color Options", description: "Available in eye-catching color variants" },
     ],
-    fullSpecs: [
-      { label: "Motor", value: "1500W BLDC Hub Motor" },
-      { label: "Battery", value: "60V 30Ah Lithium-ion" },
-      { label: "Range", value: "Up to 100 Km" },
-      { label: "Top Speed", value: "60 Km/h" },
-      { label: "Charge Time", value: "2 to 4 Hours" },
-      { label: "Braking", value: "Disc + Drum (CBS)" },
-      { label: "Suspension (F)", value: "Telescopic Fork" },
-      { label: "Suspension (R)", value: "Dual Shock Absorbers" },
-      { label: "Tyre (F)", value: "90/90-12" },
-      { label: "Tyre (R)", value: "90/90-12" },
-      { label: "Kerb Weight", value: "115 Kg" },
-      { label: "Load Capacity", value: "150 Kg" },
-    ],
-  },
-  "tetla-e9-pro": {
-    tagline: "Smart performance with premium comfort",
-    range: "Up to 120 Km",
-    chargeTime: "2 to 4 Hrs",
-    topSpeed: "70 Km/h",
-    motorPower: "2000W",
-    features: [
-      { title: "Pro-Tuned Suspension", desc: "Sport-calibrated front forks and mono-shock rear for a planted, confident ride" },
-      { title: "Fast Charge Ready", desc: "Compatible with rapid chargers — back to full in under 3 hours" },
-      { title: "Ride Mode Selection", desc: "Switch between Eco, City, and Sport modes for the performance you need" },
-    ],
-    fullSpecs: [
-      { label: "Motor", value: "2000W BLDC Hub Motor" },
-      { label: "Battery", value: "72V 32Ah Lithium-ion" },
-      { label: "Range", value: "Up to 120 Km" },
-      { label: "Top Speed", value: "70 Km/h" },
-      { label: "Charge Time", value: "2 to 4 Hours" },
-      { label: "Braking", value: "Dual Disc (ABS)" },
-      { label: "Suspension (F)", value: "USD Telescopic Fork" },
-      { label: "Suspension (R)", value: "Mono-shock" },
-      { label: "Tyre (F)", value: "100/80-12" },
-      { label: "Tyre (R)", value: "100/80-12" },
-      { label: "Kerb Weight", value: "125 Kg" },
-      { label: "Load Capacity", value: "160 Kg" },
-    ],
-  },
-};
-
-// Default extras for products not yet in the map
-const DEFAULT_EXTRAS = PRODUCT_EXTRAS["tetla-classic"];
+  };
+}
 
 export default async function ProductPage({
   params,
@@ -82,232 +39,133 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-
   const product = await getProductBySlug(slug);
-
   if (!product) notFound();
 
-  const extras = PRODUCT_EXTRAS[slug] ?? DEFAULT_EXTRAS;
-  const specs = product.specs as Record<string, string> ?? {};
-  const priceFormatted = Number(product.price).toLocaleString("en-IN");
-
-  // True 360 spin: turntable stills live in public/360/{slug}/ (sorted by
-  // filename). public/360/_default/ (extracted from 3dvideo.mp4 via
-  // scripts/extract-360-frames.js) is the shared placeholder until each
-  // product gets its own shoot.
-  const readFrames = (dirName: string): string[] => {
-    const dir = path.join(process.cwd(), "public", "360", dirName);
-    if (!fs.existsSync(dir)) return [];
-    return fs
-      .readdirSync(dir)
-      .filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
-      .sort()
-      .map((f) => `/360/${dirName}/${f}`);
-  };
-  const frames = readFrames(slug);
-  const heroFrames = frames.length >= 8 ? frames : readFrames("_default");
+  const c = (product.pageContent as ProductPageContent) ?? fallbackContent(product.name);
+  const stats = [
+    { label: "Range", value: c.stats.range },
+    { label: "Full Charge", value: c.stats.fullCharge },
+    { label: "Top Speed", value: c.stats.topSpeed },
+    { label: "Running Cost", value: c.stats.runningCost },
+    { label: "Battery Warranty", value: c.stats.batteryWarranty },
+  ];
 
   return (
-    <div className="w-full overflow-x-hidden bg-[#030712] text-white">
+    <div className="w-full overflow-x-hidden bg-white text-black">
       <Header />
 
-      {/* ── 1. PREMIUM BANNER — full-screen dark cinematic ───────────────── */}
-      <HeroShowcase
-        name={product.name}
-        model={specs.model ?? "RTO Model"}
-        tagline={extras.tagline}
-        image="/3601.jpeg"
-        stats={[
-          { label: "Starting from", value: `₹${priceFormatted}` },
-          { label: "Range", value: extras.range },
-          { label: "Charge Time", value: extras.chargeTime },
-          { label: "Top Speed", value: extras.topSpeed },
-        ]}
-      />
+      {/* ── 1. HERO ──────────────────────────────────────────────────────── */}
+      <HeroShowcase name={product.name} tagline={c.tagline} hero={c.hero} />
 
-      {/* ── 2. FULL-SCREEN 360° TURNTABLE ────────────────────────────────── */}
-      <section className="relative h-screen w-full bg-black flex flex-col">
-        <div className="pt-24 md:pt-28 text-center shrink-0">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-white/30 mb-3">Interactive</p>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Explore Every Angle</h2>
-          <p className="mt-3 text-sm text-white/40">Drag left or right to rotate</p>
-        </div>
-        <div className="flex-1 min-h-0 flex items-center justify-center px-5">
-          <Frame360 frames={heroFrames} className="h-full w-full max-w-[1100px]" />
-        </div>
-      </section>
+      {/* ── 2. DESCRIPTION + STATS CARD (overlapping) ────────────────────── */}
+      <section className="relative bg-white">
+        <div className="px-5 sm:px-8 md:px-12 lg:px-20">
+          {/* Figma Frame 367: 1280 wide · radius 16 · border 1px · padding 40 */}
+          <div className="relative mt-16 md:mt-[100px] rounded-2xl bg-white shadow-[0_20px_60px_rgba(0,0,0,0.10)] border border-black/5 p-6 sm:p-8 md:p-10 overflow-hidden">
+            {/* Faint logo watermarks — top-right & bottom-left corners (Figma: opacity 5%) */}
+            <Image
+              src="/logoproduct.png"
+              alt=""
+              width={148}
+              height={191}
+              aria-hidden
+              className="pointer-events-none select-none absolute -top-2 right-4 w-[90px] md:w-[148px] h-auto opacity-[0.05]"
+            />
+            <Image
+              src="/logoproduct.png"
+              alt=""
+              width={148}
+              height={191}
+              aria-hidden
+              className="pointer-events-none select-none absolute -bottom-2 left-4 w-[90px] md:w-[148px] h-auto opacity-[0.05]"
+            />
 
-      {/* ── 3. PERFORMANCE NUMBERS ───────────────────────────────────────── */}
-      <section className="bg-[#030712] py-20 border-y border-white/5">
-        <div className="max-w-[1200px] mx-auto px-5 sm:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-0 md:divide-x divide-white/10">
-            {[
-              { value: extras.range, label: "Electric Range" },
-              { value: extras.topSpeed, label: "Top Speed" },
-              { value: extras.chargeTime, label: "Full Charge" },
-              { value: extras.motorPower, label: "Motor Power" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center md:px-8">
-                <p className="text-3xl md:text-5xl font-black text-white mb-2 tracking-tight">
-                  {stat.value}
-                </p>
-                <p className="text-[11px] uppercase tracking-[0.25em] text-white/35">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            <p className="relative z-10 text-center text-lg md:text-2xl font-medium leading-relaxed text-black/80 max-w-3xl mx-auto">
+              <HighlightText text={c.description} />
+            </p>
 
-      {/* ── 4. FEATURE SPOTLIGHT — text left, image right ────────────────── */}
-      <section className="bg-black py-24 md:py-36">
-        <div className="max-w-[1200px] mx-auto px-5 sm:px-6">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            {/* Text */}
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-white/30 mb-4">Design</p>
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight mb-6">
-                Built for the<br />Road Ahead
-              </h2>
-              <p className="text-white/50 text-base leading-relaxed mb-10 max-w-md">
-                Every curve, every line of the {product.name} is engineered with purpose — aerodynamic efficiency meets bold, head-turning aesthetics designed for the modern urban rider.
-              </p>
-              <div className="space-y-6">
-                {extras.features.map((f) => (
-                  <div key={f.title} className="flex gap-4">
-                    <div className="mt-1 w-1 h-1 rounded-full bg-white/40 flex-shrink-0" />
-                    <div>
-                      <p className="text-sm font-semibold text-white mb-1">{f.title}</p>
-                      <p className="text-sm text-white/40 leading-snug">{f.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            {/* Image */}
-            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#0d1117]">
-              <Image
-                src="/3602.jpeg"
-                alt={`${product.name} front view`}
-                fill
-                className="object-contain p-8"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
+            {/* Stat strip */}
+            <div className="relative z-10 mt-6 md:mt-2.5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-y-8 lg:divide-x divide-black/10">
+              {stats.map((s) => (
+                <div key={s.label} className="text-center lg:px-4">
+                  <p className="text-[16px] font-semibold leading-none tracking-normal text-[#5A5A5A] mb-2">{s.label}</p>
+                  <p className="text-[32px] md:text-[44px] font-normal leading-none tracking-normal text-center text-[#3A3A3A]">{s.value}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 5. FULL-BLEED BANNER ─────────────────────────────────────────── */}
-      <section className="relative h-[60vh] min-h-[400px] overflow-hidden bg-[#080c10] flex items-center justify-center">
-        <div className="absolute inset-0">
+      {/* ── 3. SHOWCASE IMAGE (full-width) ───────────────────────────────── */}
+      <section className="bg-white pt-16 md:pt-[100px]">
+        <div className="relative w-full aspect-[16/9] md:aspect-[1440/640] max-h-[80vh]">
           <Image
-            src="/3601.jpeg"
-            alt={product.name}
+            src={c.showcaseImage}
+            alt={`${product.name} showcase`}
             fill
-            className="object-cover object-center opacity-25"
             sizes="100vw"
-            loading="lazy"
+            className="object-cover"
+            priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#030712] via-transparent to-[#030712]" />
-        </div>
-        <div className="relative z-10 text-center px-5">
-          <p className="text-[10px] uppercase tracking-[0.4em] text-white/30 mb-4">The future of urban mobility</p>
-          <h2
-            className="font-black uppercase tracking-tighter text-white leading-none"
-            style={{ fontSize: "clamp(42px, 10vw, 120px)" }}
-          >
-            Zero Emissions.<br />Maximum Thrill.
-          </h2>
         </div>
       </section>
 
-      {/* ── 6. TECH SPECS SCREEN ─────────────────────────────────────────── */}
-      <section className="bg-[#030712] py-24 md:py-32" id="specs">
-        <div className="max-w-[1100px] mx-auto px-5 sm:px-6">
-          <div className="mb-14 text-center">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-white/30 mb-3">Technical</p>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Full Specifications</h2>
-          </div>
-
-          {/* Screen frame */}
-          <div
-            className="rounded-2xl border border-white/8 overflow-hidden"
-            style={{ background: "linear-gradient(135deg, #0d1117 0%, #060a0f 100%)" }}
-          >
-            {/* Screen top bar */}
-            <div className="flex items-center gap-2 px-5 py-3 border-b border-white/5">
-              <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
-              <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
-              <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
-              <span className="ml-3 text-[10px] uppercase tracking-[0.25em] text-white/20 font-mono">
-                {product.name} — Technical Data Sheet
-              </span>
-            </div>
-
-            {/* Spec grid */}
-            <div className="p-6 md:p-10">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-white/5 rounded-xl overflow-hidden">
-                {extras.fullSpecs.map((spec, i) => (
-                  <div
-                    key={spec.label}
-                    className="flex items-center justify-between px-5 py-4 bg-[#0d1117]"
-                  >
-                    <span className="text-xs uppercase tracking-[0.18em] text-white/30 font-mono">
-                      {spec.label}
-                    </span>
-                    <span className="text-sm font-semibold text-white font-mono">
-                      {spec.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Screen footer */}
-              <div className="mt-6 flex items-center justify-between text-[10px] font-mono text-white/15 uppercase tracking-widest">
-                <span>TETLA Motors — {product.name}</span>
-                <span>Specifications subject to change</span>
-              </div>
+      {/* ── 4. FEATURE BENTO ─────────────────────────────────────────────── */}
+      <section className="bg-white pt-16 md:pt-[100px] pb-16 md:pb-[100px]">
+        <div className="px-5 sm:px-8 md:px-12 lg:px-20">
+          {/* Figma block: 1280×904 — left 480, right 768, gap 32; right rows 370/500 */}
+          <div className="grid grid-cols-1 gap-4 md:gap-6 lg:gap-8 lg:grid-cols-[480fr_768fr] lg:grid-rows-[370fr_500fr] lg:aspect-[1280/904]">
+            {/* Card 1 — tall left (480×904) */}
+            <BentoCard
+              f={c.features[0]}
+              className="aspect-[480/904] lg:aspect-auto lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:h-full"
+            />
+            {/* Card 2 — Bold Urban Design, top right full width (768×370) */}
+            <BentoCard
+              f={c.features[1]}
+              className="aspect-[768/370] lg:aspect-auto lg:col-start-2 lg:row-start-1 lg:h-full"
+            />
+            {/* Cards 3 & 4 — bottom right split (368×500 each) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 lg:gap-8 lg:col-start-2 lg:row-start-2 lg:h-full">
+              <BentoCard f={c.features[2]} className="aspect-[368/500] lg:aspect-auto lg:h-full" />
+              <BentoCard f={c.features[3]} className="aspect-[368/500] lg:aspect-auto lg:h-full" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 7. CTA / ENQUIRY ─────────────────────────────────────────────── */}
-      <section className="bg-white py-24 md:py-32 text-black" id="enquiry">
-        <div className="max-w-[900px] mx-auto px-5 sm:px-6 text-center">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-black/30 mb-4">Own One</p>
-          <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-6">
-            Ready to Ride<br />the Future?
-          </h2>
-          <p className="text-base text-black/50 max-w-md mx-auto mb-10">
-            Book a test ride at your nearest TETLA dealership, or place your order today. Delivery available across India.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link
-              href="/#dealership"
-              className="rounded-full bg-black px-10 py-4 text-sm font-bold text-white hover:bg-black/80 transition"
-            >
-              Make an Enquiry
-            </Link>
-            <Link
-              href="/dealerships"
-              className="rounded-full border border-black/20 px-10 py-4 text-sm font-bold text-black hover:border-black/50 transition"
-            >
-              Find a Dealership
-            </Link>
-          </div>
-
-          {/* Price callout */}
-          <div className="mt-14 inline-flex items-baseline gap-2">
-            <span className="text-sm text-black/30 uppercase tracking-widest">Starting from</span>
-            <span className="text-4xl font-black text-black">₹{priceFormatted}</span>
-          </div>
-        </div>
+      {/* ── 5. FEATURE COVERFLOW (dark) ──────────────────────────────────── */}
+      {/* Figma: full-bleed · bg #00060C · padding-y 80 · gap 24 · height 640 (80+480+80) */}
+      <section className="bg-[#00060C] py-12 md:py-20 overflow-hidden">
+        <FeatureCoverflow features={c.features} />
       </section>
+
+      {/* ── Hidden anchor for hero CTAs ──────────────────────────────────── */}
+      <div id="enquiry" />
 
       <Footer />
     </div>
+  );
+}
+
+function BentoCard({ f, className = "" }: { f: ProductPageContent["features"][number]; className?: string }) {
+  return (
+    <article className={`relative overflow-hidden rounded-2xl group ${className}`}>
+      <Image
+        src={f.image}
+        alt={f.title}
+        fill
+        sizes="(max-width: 768px) 100vw, 50vw"
+        className="object-cover transition-transform duration-700 group-hover:scale-105"
+        loading="lazy"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-6">
+        <h3 className="font-chakra text-lg md:text-xl font-bold text-white mb-1.5">{f.title}</h3>
+        <p className="text-xs md:text-sm text-white/75 leading-snug max-w-sm">{f.description}</p>
+      </div>
+    </article>
   );
 }

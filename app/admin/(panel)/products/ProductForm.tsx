@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { VideoUpload } from "@/app/components/ui/VideoUpload";
 import { Plus, X } from "lucide-react";
+import type { ProductPageContent } from "@/lib/db/schema";
 
 type Spec = { key: string; value: string };
 
@@ -19,7 +20,40 @@ type ProductData = {
   specs: Spec[];
   video_url: string;
   video_public_id: string;
+  page_content?: ProductPageContent | null;
 };
+
+const emptyPageContent = (): ProductPageContent => ({
+  tagline: "",
+  hero: { type: "video", url: "/v1.mp4" },
+  description: "",
+  stats: { range: "", fullCharge: "", topSpeed: "", runningCost: "", batteryWarranty: "" },
+  showcaseImage: "",
+  features: [
+    { image: "", title: "", description: "" },
+    { image: "", title: "", description: "" },
+    { image: "", title: "", description: "" },
+    { image: "", title: "", description: "" },
+  ],
+});
+
+// Unsigned Cloudinary upload — returns the secure URL or null.
+async function uploadToCloudinary(file: File): Promise<string | null> {
+  const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+  if (!cloud || !preset) return null;
+  const isVideo = file.type.startsWith("video/");
+  const body = new FormData();
+  body.append("file", file);
+  body.append("upload_preset", preset);
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloud}/${isVideo ? "video" : "image"}/upload`,
+    { method: "POST", body }
+  );
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.secure_url ?? null;
+}
 
 const toSlug = (s: string) =>
   s.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_]+/g, "-");
@@ -42,11 +76,36 @@ export function ProductForm({ initial }: { initial?: Partial<ProductData> }) {
     video_url: initial?.video_url ?? "",
     video_public_id: initial?.video_public_id ?? "",
   });
+  const [pc, setPc] = useState<ProductPageContent>(initial?.page_content ?? emptyPageContent());
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   const set = (k: keyof ProductData, v: any) =>
     setForm((p) => ({ ...p, [k]: v }));
+
+  // Page-content helpers
+  const setStat = (k: keyof ProductPageContent["stats"], v: string) =>
+    setPc((p) => ({ ...p, stats: { ...p.stats, [k]: v } }));
+  const setFeature = (i: number, field: "image" | "title" | "description", v: string) =>
+    setPc((p) => ({
+      ...p,
+      features: p.features.map((f, j) => (j === i ? { ...f, [field]: v } : f)),
+    }));
+  const uploadFeatureImage = async (i: number, file: File) => {
+    const url = await uploadToCloudinary(file);
+    if (url) setFeature(i, "image", url);
+  };
+  const uploadShowcase = async (file: File) => {
+    const url = await uploadToCloudinary(file);
+    if (url) setPc((p) => ({ ...p, showcaseImage: url }));
+  };
+  const uploadHero = async (file: File) => {
+    const url = await uploadToCloudinary(file);
+    if (url) {
+      const type = file.type.startsWith("video/") ? "video" : "image";
+      setPc((p) => ({ ...p, hero: { type, url } }));
+    }
+  };
 
   const handleNameChange = (name: string) => {
     setForm((p) => ({ ...p, name, slug: p.slug || toSlug(name) }));
@@ -65,23 +124,9 @@ export function ProductForm({ initial }: { initial?: Partial<ProductData> }) {
   };
 
   const handleImageUpload = async (i: number, file: File) => {
-    // Unsigned Cloudinary upload (same preset as video uploads)
-    const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-    const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-    if (!cloud || !preset) {
-      setError("Cloudinary is not configured.");
-      return;
-    }
-    const body = new FormData();
-    body.append("file", file);
-    body.append("upload_preset", preset);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud}/image/upload`, {
-      method: "POST",
-      body,
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-    if (data.secure_url) setImage(i, data.secure_url);
+    const url = await uploadToCloudinary(file);
+    if (url) setImage(i, url);
+    else setError("Cloudinary is not configured.");
   };
 
   const save = async () => {
@@ -103,6 +148,7 @@ export function ProductForm({ initial }: { initial?: Partial<ProductData> }) {
       specs: specsObj,
       videoUrl: form.video_url || null,
       videoPublicId: form.video_public_id || null,
+      pageContent: pc,
     };
 
     const res = initial?.id
@@ -281,6 +327,145 @@ export function ProductForm({ initial }: { initial?: Partial<ProductData> }) {
           >
             <Plus size={12} /> Add spec
           </button>
+        </div>
+      </div>
+
+      {/* ── PAGE CONTENT (product landing page) ──────────────────────────── */}
+      <div className="pt-4 mt-4 border-t border-gray-200">
+        <h2 className="text-sm font-bold text-gray-900 mb-1">Product Page Content</h2>
+        <p className="text-xs text-gray-400 mb-5">Controls the public product page (hero, description, stats, feature cards).</p>
+
+        {/* Tagline */}
+        <div className="mb-4">
+          <label className="block text-xs font-medium text-gray-500 mb-1">Tagline (under the name in the hero)</label>
+          <input
+            className={INPUT}
+            value={pc.tagline}
+            onChange={(e) => setPc((p) => ({ ...p, tagline: e.target.value }))}
+            placeholder="Efficient, stylish, and built for city rides"
+          />
+        </div>
+
+        {/* Hero media */}
+        <div className="mb-4">
+          <label className="block text-xs font-medium text-gray-500 mb-1">
+            Hero media (image or video) — current: <span className="text-gray-700">{pc.hero.type}</span>
+          </label>
+          <div className="flex gap-2 items-center">
+            <input
+              className={`${INPUT} flex-1`}
+              value={pc.hero.url}
+              onChange={(e) => setPc((p) => ({ ...p, hero: { ...p.hero, url: e.target.value } }))}
+              placeholder="/v1.mp4 or https://…"
+            />
+            <select
+              className="h-11 rounded-lg border border-gray-200 px-2 text-sm text-gray-700"
+              value={pc.hero.type}
+              onChange={(e) => setPc((p) => ({ ...p, hero: { ...p.hero, type: e.target.value as "image" | "video" } }))}
+            >
+              <option value="video">Video</option>
+              <option value="image">Image</option>
+            </select>
+            <label className="shrink-0 cursor-pointer h-11 px-3 flex items-center rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50">
+              Upload
+              <input type="file" accept="image/*,video/*" className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadHero(f); }} />
+            </label>
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="mb-4">
+          <label className="block text-xs font-medium text-gray-500 mb-1">
+            Description (wrap words in **double asterisks** to highlight them red)
+          </label>
+          <textarea
+            rows={3}
+            className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-gray-400 resize-none"
+            value={pc.description}
+            onChange={(e) => setPc((p) => ({ ...p, description: e.target.value }))}
+            placeholder="Combining timeless **design**, **smart technology**…"
+          />
+        </div>
+
+        {/* Stats */}
+        <div className="mb-4">
+          <label className="block text-xs font-medium text-gray-500 mb-2">Stats</label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {([
+              ["range", "Range"],
+              ["fullCharge", "Full Charge"],
+              ["topSpeed", "Top Speed"],
+              ["runningCost", "Running Cost"],
+              ["batteryWarranty", "Battery Warranty"],
+            ] as const).map(([key, label]) => (
+              <div key={key}>
+                <span className="block text-[10px] uppercase tracking-wide text-gray-400 mb-1">{label}</span>
+                <input
+                  className={INPUT}
+                  value={pc.stats[key]}
+                  onChange={(e) => setStat(key, e.target.value)}
+                  placeholder={label}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Showcase image */}
+        <div className="mb-4">
+          <label className="block text-xs font-medium text-gray-500 mb-1">Showcase image (large full-width photo)</label>
+          <div className="flex gap-2 items-center">
+            <input
+              className={`${INPUT} flex-1`}
+              value={pc.showcaseImage}
+              onChange={(e) => setPc((p) => ({ ...p, showcaseImage: e.target.value }))}
+              placeholder="/products/tetla-classic/showcase.jpg"
+            />
+            <label className="shrink-0 cursor-pointer h-11 px-3 flex items-center rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50">
+              Upload
+              <input type="file" accept="image/*" className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadShowcase(f); }} />
+            </label>
+          </div>
+        </div>
+
+        {/* Feature cards */}
+        <div>
+          <label className="block text-xs font-medium text-gray-500 mb-2">Feature cards (4 — shown as grid + coverflow)</label>
+          <div className="space-y-3">
+            {pc.features.map((f, i) => (
+              <div key={i} className="rounded-lg border border-gray-200 p-3 space-y-2">
+                <p className="text-[10px] uppercase tracking-wide text-gray-400">Card {i + 1}</p>
+                <input
+                  className={INPUT}
+                  value={f.title}
+                  onChange={(e) => setFeature(i, "title", e.target.value)}
+                  placeholder="Built for Daily Commutes"
+                />
+                <textarea
+                  rows={2}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 outline-none focus:border-gray-400 resize-none"
+                  value={f.description}
+                  onChange={(e) => setFeature(i, "description", e.target.value)}
+                  placeholder="Reliable electric mobility designed for…"
+                />
+                <div className="flex gap-2 items-center">
+                  <input
+                    className={`${INPUT} flex-1`}
+                    value={f.image}
+                    onChange={(e) => setFeature(i, "image", e.target.value)}
+                    placeholder="/products/tetla-classic/feature-1.jpg"
+                  />
+                  <label className="shrink-0 cursor-pointer h-11 px-3 flex items-center rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50">
+                    Upload
+                    <input type="file" accept="image/*" className="hidden"
+                      onChange={(e) => { const file = e.target.files?.[0]; if (file) uploadFeatureImage(i, file); }} />
+                  </label>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

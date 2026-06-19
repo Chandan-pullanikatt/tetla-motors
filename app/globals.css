@@ -32,3 +32,8 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Chakra Petch — secondary font, used for big section titles */
+.font-chakra {
+  font-family: var(--font-chakra), var(--font-urbanist), sans-serif;
+}

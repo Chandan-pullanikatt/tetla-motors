@@ -21,9 +21,26 @@ export const products = pgTable("products", {
   images: text("images").array().default([]),
   videoUrl: text("video_url"),
   videoPublicId: text("video_public_id"),
+  pageContent: jsonb("page_content").$type<ProductPageContent>(),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
+
+// ─── Per-product page content (Figma redesign, CMS-editable) ─────────────────
+export type ProductPageContent = {
+  tagline: string;
+  hero: { type: "image" | "video"; url: string };
+  description: string; // supports **word** → red highlight
+  stats: {
+    range: string;
+    fullCharge: string;
+    topSpeed: string;
+    runningCost: string;
+    batteryWarranty: string;
+  };
+  showcaseImage: string;
+  features: { image: string; title: string; description: string }[]; // exactly 4
+};
 
 // ─── Blogs ─────────────────────────────────────────────────────────────────
 export const blogs = pgTable("blogs", {

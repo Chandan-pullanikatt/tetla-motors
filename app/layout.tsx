@@ -1,10 +1,18 @@
 import "./globals.css";
-import { Urbanist } from "next/font/google";
+import { Urbanist, Chakra_Petch } from "next/font/google";
 
 const urbanist = Urbanist({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
   display: "swap",
+  variable: "--font-urbanist",
+});
+
+const chakraPetch = Chakra_Petch({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-chakra",
 });
 
 export const metadata = {
@@ -17,7 +25,7 @@ import { SmoothScroll } from "@/app/components/ui/SmoothScroll";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={urbanist.className}>
+      <body className={`${urbanist.variable} ${chakraPetch.variable} ${urbanist.className}`}>
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>

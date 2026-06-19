@@ -30,6 +30,7 @@ export default function EditProductPage() {
           specs: specs.length ? specs : [{ key: "", value: "" }],
           video_url: data.videoUrl ?? "",
           video_public_id: data.videoPublicId ?? "",
+          page_content: data.pageContent ?? null,
         });
       }
       setLoading(false);
