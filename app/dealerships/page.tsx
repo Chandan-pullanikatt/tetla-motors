@@ -1,52 +1,99 @@
-import Link from "next/link";
-import { Button } from "@/app/components/ui/button";
+"use client";
 
-const dealers = [
-  { name: "Tetla Los Angeles", address: "123 Sunset Blvd, Los Angeles, CA", phone: "(323) 555-0101" },
-  { name: "Tetla New York", address: "456 Broadway, New York, NY", phone: "(212) 555-0102" },
-  { name: "Tetla Miami", address: "789 Ocean Dr, Miami, FL", phone: "(305) 555-0103" },
-  { name: "Tetla London", address: "10 Downing St, London, UK", phone: "+44 20 7946 0000" },
-  { name: "Tetla Berlin", address: "Unter den Linden 1, Berlin, DE", phone: "+49 30 123456" },
-  { name: "Tetla Tokyo", address: "1-1 Chiyoda, Tokyo, JP", phone: "+81 3 1234 5678" },
+import { useState } from "react";
+import { Header } from "@/app/components/layout/Header";
+import { Footer } from "@/app/components/layout/Footer";
+import { ShowroomFinder } from "@/app/components/sections/ShowroomFinder";
+
+const faqs = [
+  {
+    q: "How do I charge a Tetla EV bike?",
+    a: "You can charge your Tetla bike using any standard household power socket. Just plug in the charger, and the bike will begin charging automatically.",
+  },
+  {
+    q: "How much does it cost to charge a Tetla bike?",
+    a: "Charging a Tetla bike is very affordable. Depending on electricity rates, a full charge usually costs ₹10–₹20, making it far cheaper than fuel-based vehicles.",
+  },
+  {
+    q: "How long does the battery last?",
+    a: "Battery life depends on the model and riding conditions, but most Tetla bikes offer a practical range suitable for daily city commutes on a single charge.",
+  },
+  {
+    q: "How fast can a Tetla EV bike go?",
+    a: "Top speed varies by model, but most urban-focused Tetla bikes are designed for safe and efficient city riding speeds.",
+  },
+  {
+    q: "Are Tetla bikes safe for city riding?",
+    a: "Yes. With proper braking systems, lighting, and safety features, Tetla bikes are well-suited for city use when ridden responsibly.",
+  },
+  {
+    q: "What makes Tetla bikes different from other electric bikes?",
+    a: "A blend of premium design, efficient performance, and smart features tailored for modern urban mobility sets Tetla apart.",
+  },
 ];
 
 export default function DealershipsPage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+
   return (
-    <div className="min-h-screen bg-black text-white pt-32 pb-20">
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16">
-          <div>
-            <h1 className="text-5xl md:text-[64px] font-bold mb-6 tracking-tight leading-none">
-              FIND A <span className="text-[#00D9A3]">DEALER</span>
-            </h1>
-            <p className="text-[#999] max-w-xl text-lg font-light">
-              Experience Tetla Motors in person. Visit one of our showrooms to see our vehicles up close and schedule a test drive.
-            </p>
+    <div className="w-full overflow-x-hidden bg-[#F5F5F5] text-[#1a1a1a]">
+      <Header variant="solid" />
+
+      {/* ── HERO ─────────────────────────────────────────────────────────── */}
+      <section className="pt-32 pb-10 md:pt-40 md:pb-14">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6 text-center">
+          <h1 className="text-3xl md:text-[40px] font-bold tracking-tight text-[#1a1a1a]">
+            Find Your Tetla
+          </h1>
+          <p className="mx-auto mt-3 max-w-2xl text-sm md:text-base font-light leading-relaxed text-[#555]">
+            Experience the pinnacle of automotive engineering across our growing network of curated
+            retailers. From our high-reach Experience Centers to our dedicated service hubs.
+          </p>
+        </div>
+      </section>
+
+      {/* ── SHOWROOM FINDER ──────────────────────────────────────────────── */}
+      <section className="pb-20 md:pb-28">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <ShowroomFinder />
+        </div>
+      </section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────────────── */}
+      <section className="bg-white py-16 md:py-24">
+        <div className="mx-auto max-w-[900px] px-5 sm:px-6">
+          <div className="mb-8 text-center">
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-[#1a1a1a]">
+              Frequently Asked Questions
+            </h2>
+            <p className="mt-2 text-sm text-[#666]">Answers to Your Most Common Questions</p>
           </div>
-          <Link href="/dealerships/become-dealer">
-            <Button size="lg" className="mt-8 md:mt-0 px-10 py-6 text-lg">Become a Dealer</Button>
-          </Link>
-        </div>
 
-        {/* Map Placeholder */}
-        <div className="w-full h-96 bg-[#111] rounded-2xl mb-16 flex items-center justify-center border border-[#222]">
-          <span className="text-2xl font-bold text-[#333] tracking-widest">INTERACTIVE MAP PLACEHOLDER</span>
+          <div className="space-y-3">
+            {faqs.map((item, index) => {
+              const isOpen = openFaq === index;
+              return (
+                <div key={index} className="overflow-hidden rounded-2xl border border-gray-200 bg-[#FAFAFA]">
+                  <button
+                    className="flex w-full items-center justify-between px-5 py-4 text-left text-sm font-medium text-[#1a1a1a] md:px-6 md:py-5"
+                    onClick={() => setOpenFaq(isOpen ? null : index)}
+                  >
+                    <span>{item.q}</span>
+                    <span className="ml-4 text-xl">{isOpen ? "−" : "+"}</span>
+                  </button>
+                  {isOpen && (
+                    <div className="border-t border-gray-200 px-5 pb-5 pt-3 text-sm text-gray-700 md:px-6">
+                      {item.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {dealers.map((dealer, index) => (
-            <div key={index} className="p-8 bg-gradient-to-br from-[#111] to-[#1a1a1a] rounded-2xl border border-[#222] hover:border-[#00D9A3]/50 transition-colors duration-300 group">
-              <h3 className="text-xl font-bold mb-3 text-white group-hover:text-[#00D9A3] transition-colors">{dealer.name}</h3>
-              <p className="text-[#999] text-sm mb-6">{dealer.address}</p>
-              <p className="text-[#00D9A3] text-sm font-medium mb-6">{dealer.phone}</p>
-              <div className="flex gap-4">
-                <Button variant="outline" size="sm" className="w-full border-[#333] hover:bg-[#222] text-white">Directions</Button>
-                <Button variant="secondary" size="sm" className="w-full bg-[#222] hover:bg-[#333] text-white">Call</Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <Footer />
     </div>
   );
 }

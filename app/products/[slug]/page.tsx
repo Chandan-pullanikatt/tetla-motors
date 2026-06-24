@@ -6,6 +6,7 @@ import { Header } from "@/app/components/layout/Header";
 import { Footer } from "@/app/components/layout/Footer";
 import { HeroShowcase } from "./HeroShowcase";
 import { FeatureCoverflow } from "./FeatureCoverflow";
+import { SavingsCalculator } from "./SavingsCalculator";
 import { HighlightText } from "./HighlightText";
 import type { ProductPageContent } from "@/lib/db/schema";
 
@@ -141,6 +142,9 @@ export default async function ProductPage({
       <section className="bg-[#00060C] py-12 md:py-20 overflow-hidden">
         <FeatureCoverflow features={c.features} />
       </section>
+
+      {/* ── 6. SAVINGS CALCULATOR (last section) ─────────────────────────── */}
+      <SavingsCalculator />
 
       {/* ── Hidden anchor for hero CTAs ──────────────────────────────────── */}
       <div id="enquiry" />

@@ -7,6 +7,7 @@ import { Footer } from "@/app/components/layout/Footer";
 import { Reveal, Parallax } from "@/app/components/ui/GsapReveal";
 import { LazyVideo } from "@/app/components/ui/LazyVideo";
 import { VoicesCoverflow } from "@/app/components/sections/VoicesCoverflow";
+import { ShowroomFinder } from "@/app/components/sections/ShowroomFinder";
 
 const faqs = [
   {
@@ -387,6 +388,25 @@ export default function Home() {
                 Learn More About Us
               </button>
             </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* FIND A DEALERSHIP */}
+      <section className="bg-[#F5F5F5] py-20 text-black md:py-28">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <Reveal>
+            <div className="mb-10 text-center">
+              <h2 className="text-3xl font-semibold tracking-tight text-[#1a1a1a] md:text-4xl">
+                Find a Dealership Near You
+              </h2>
+              <p className="mt-2 text-sm text-[#666]">
+                Locate your nearest showroom, explore available models, schedule a test ride, and get expert assistance
+              </p>
+            </div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <ShowroomFinder />
           </Reveal>
         </div>
       </section>

@@ -16,7 +16,8 @@ const navLinks = [
     { name: "Blogs", href: "/blog" },
 ];
 
-export function Header() {
+export function Header({ variant = "transparent" }: { variant?: "transparent" | "solid" }) {
+    const isSolid = variant === "solid";
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const headerRef = useRef(null);
@@ -57,7 +58,11 @@ export function Header() {
             ref={headerRef}
             className={cn(
                 "fixed top-0 left-0 right-0 z-[100] transition-all duration-300",
-                scrolled ? "bg-black/80 backdrop-blur-md py-3 border-b border-white/10" : "bg-transparent py-4"
+                isSolid
+                    ? "bg-black py-3 border-b border-white/10"
+                    : scrolled
+                        ? "bg-black/80 backdrop-blur-md py-3 border-b border-white/10"
+                        : "bg-transparent py-4"
             )}
         >
             <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 flex flex-row items-center gap-8">

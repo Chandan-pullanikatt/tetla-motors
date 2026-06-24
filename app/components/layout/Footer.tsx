@@ -43,7 +43,7 @@ export function Footer() {
                         <h4 className="text-[#999] mb-6 text-sm">Explore</h4>
                         <ul className="space-y-4 text-sm font-medium">
                             <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">Service</Link></li>
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">Dealership</Link></li>
+                            <li><Link href="/dealerships" className="hover:text-[#00D9A3] transition-colors">Dealership</Link></li>
                             <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">Saving Calculator</Link></li>
                             <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">Warranty</Link></li>
                             <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">TETLA Voiture</Link></li>
@@ -54,7 +54,8 @@ export function Footer() {
                     <div>
                         <h4 className="text-[#999] mb-6 text-sm">Discover</h4>
                         <ul className="space-y-4 text-sm font-medium">
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">About Us</Link></li>
+                            <li><Link href="/about" className="hover:text-[#00D9A3] transition-colors">About Us</Link></li>
+                            <li><Link href="/retail-partner" className="hover:text-[#00D9A3] transition-colors">Retail Partner</Link></li>
                             <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">FAQs</Link></li>
                             <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">Blogs</Link></li>
                             <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">Terms</Link></li>
