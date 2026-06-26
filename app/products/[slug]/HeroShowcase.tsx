@@ -36,7 +36,8 @@ export function HeroShowcase({ name, tagline, hero }: Props) {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
+          poster={hero.url.replace(/\.mp4$/, "-poster.jpg")}
           src={hero.url}
         />
       ) : (

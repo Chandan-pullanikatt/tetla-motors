@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(cp \"C:/Users/chand/AppData/Local/Temp/claude/d--work-tetla-motors/5f102498-3dee-4366-884b-cb99c57b3472/scratchpad/compress-images.mjs\" \"d:/work/tetla-motors/_compress-images.mjs\")",
+      "Bash(rm -f \"d:/work/tetla-motors/_compress-images.mjs\")",
+      "Bash(echo \"=== typecheck exit: $? ===\")"
     ]
   }
 }

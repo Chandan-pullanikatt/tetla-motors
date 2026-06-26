@@ -130,6 +130,7 @@ export default function Home() {
           loop
           playsInline
           preload="metadata"
+          poster={videos.hero.replace(/\.mp4$/, "-poster.jpg")}
           src={videos.hero}
         />
         <div className="absolute inset-0 bg-black/40" />
