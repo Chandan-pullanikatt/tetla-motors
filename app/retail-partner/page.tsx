@@ -86,12 +86,12 @@ export default function RetailPartnerPage() {
       </section>
 
       {/* ── INTRO CARD + STATS ───────────────────────────────────────────── */}
-      <section className="pb-16 md:pb-24">
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
-          <div className="relative -mt-10 overflow-hidden rounded-2xl border border-black/5 bg-white p-6 shadow-[0_20px_60px_rgba(0,0,0,0.10)] md:-mt-14 md:p-10">
+      <section className="pt-10 md:pt-16 pb-16 md:pb-24">
+        <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-10">
+          <div className="relative overflow-hidden rounded-2xl border border-black/5 bg-white p-6 shadow-[0_20px_60px_rgba(0,0,0,0.10)] md:p-10">
             {/* Faint logo watermarks */}
             <Image
-              src="/logoproduct.png"
+              src="/logocutted.png"
               alt=""
               width={148}
               height={191}
@@ -99,7 +99,7 @@ export default function RetailPartnerPage() {
               className="pointer-events-none absolute -top-2 right-4 h-auto w-[80px] select-none opacity-[0.05] md:w-[120px]"
             />
             <Image
-              src="/logoproduct.png"
+              src="/logocutted.png"
               alt=""
               width={148}
               height={191}
@@ -117,7 +117,7 @@ export default function RetailPartnerPage() {
             </p>
 
             {/* Stat strip */}
-            <div className="relative z-10 mt-8 grid grid-cols-2 gap-y-8 sm:grid-cols-4 md:divide-x md:divide-black/10">
+            <div className="relative z-10 mt-6 md:mt-2.5 grid grid-cols-2 gap-y-8 sm:grid-cols-4 md:divide-x md:divide-black/10">
               {stats.map((s) => (
                 <div key={s.label} className="text-center md:px-4">
                   <p className="mb-2 text-[13px] font-medium leading-none text-[#5A5A5A]">{s.label}</p>

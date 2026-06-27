@@ -66,7 +66,7 @@ export default async function ProductPage({
           <div className="relative mt-16 md:mt-[100px] rounded-2xl bg-white shadow-[0_20px_60px_rgba(0,0,0,0.10)] border border-black/5 p-6 sm:p-8 md:p-10 overflow-hidden">
             {/* Faint logo watermarks — top-right & bottom-left corners (Figma: opacity 5%) */}
             <Image
-              src="/logoproduct.png"
+              src="/logocutted.png"
               alt=""
               width={148}
               height={191}
@@ -74,7 +74,7 @@ export default async function ProductPage({
               className="pointer-events-none select-none absolute -top-2 right-4 w-[90px] md:w-[148px] h-auto opacity-[0.05]"
             />
             <Image
-              src="/logoproduct.png"
+              src="/logocutted.png"
               alt=""
               width={148}
               height={191}
