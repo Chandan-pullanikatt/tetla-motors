@@ -7,7 +7,9 @@
       "Bash(echo \"=== typecheck exit: $? ===\")",
       "Bash(awk '{print $5}')",
       "Bash(git check-ignore *)",
-      "Bash(awk '{print $5,$9}')"
+      "Bash(awk '{print $5,$9}')",
+      "Bash(npx next *)",
+      "Bash(npx eslint *)"
     ]
   }
 }

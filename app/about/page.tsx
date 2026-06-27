@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Header } from "@/app/components/layout/Header";
 import { Footer } from "@/app/components/layout/Footer";
+import { JourneyTimeline } from "@/app/components/ui/JourneyTimeline";
 
 const milestones = [
   {
@@ -116,37 +117,7 @@ export default function AboutPage() {
           </div>
 
           {/* Timeline */}
-          <div className="relative">
-            {/* center / left line */}
-            <div className="absolute left-4 top-0 h-full w-px bg-[#FF0000]/30 md:left-1/2 md:-translate-x-1/2" />
-
-            <div className="space-y-10 md:space-y-16">
-              {milestones.map((m, i) => {
-                const leftSide = i % 2 === 0;
-                return (
-                  <div key={m.year} className="relative md:grid md:grid-cols-2 md:items-center md:gap-12">
-                    {/* dot */}
-                    <span className="absolute left-4 top-2 z-10 h-3.5 w-3.5 -translate-x-1/2 rounded-full border-2 border-white bg-[#FF0000] shadow md:left-1/2" />
-
-                    {/* card */}
-                    <div
-                      className={`ml-10 md:ml-0 ${
-                        leftSide ? "md:col-start-1 md:pr-4" : "md:col-start-2 md:pl-4"
-                      }`}
-                    >
-                      <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm md:p-6">
-                        <span className="inline-block rounded-md bg-[#FFEDED] px-3 py-1 text-xs font-semibold text-[#FF0000]">
-                          {m.year}
-                        </span>
-                        <h3 className="mt-3 text-lg font-bold text-[#1a1a1a]">{m.title}</h3>
-                        <p className="mt-2 text-sm leading-relaxed text-[#666]">{m.desc}</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <JourneyTimeline milestones={milestones} />
         </div>
       </section>
 
