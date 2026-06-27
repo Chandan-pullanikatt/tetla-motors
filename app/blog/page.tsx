@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
+import { Header } from "@/app/components/layout/Header";
+import { Footer } from "@/app/components/layout/Footer";
 
 const posts = [
   {
@@ -27,8 +29,9 @@ const posts = [
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen bg-black text-white pt-32 pb-20">
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
+    <main className="min-h-screen bg-black text-white">
+      <Header variant="solid" />
+      <div className="pt-32 pb-20 max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
         <h1 className="text-5xl md:text-[64px] font-bold mb-16 text-center tracking-tight leading-none">
           LATEST <span className="text-[#00D9A3]">NEWS</span>
         </h1>
@@ -54,6 +57,7 @@ export default function BlogPage() {
           ))}
         </div>
       </div>
-    </div>
+      <Footer />
+    </main>
   );
 }

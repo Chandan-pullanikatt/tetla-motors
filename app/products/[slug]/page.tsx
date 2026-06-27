@@ -144,7 +144,9 @@ export default async function ProductPage({
       </section>
 
       {/* ── 6. SAVINGS CALCULATOR (last section) ─────────────────────────── */}
-      <SavingsCalculator />
+      <div id="savings" className="scroll-mt-24">
+        <SavingsCalculator />
+      </div>
 
       {/* ── Hidden anchor for hero CTAs ──────────────────────────────────── */}
       <div id="enquiry" />

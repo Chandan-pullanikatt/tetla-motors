@@ -30,11 +30,11 @@ export function Footer() {
                     <div>
                         <h4 className="text-[#999] mb-6 text-sm">Products</h4>
                         <ul className="space-y-4 text-sm font-medium">
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">TETLA Classic (RTO Model)</Link></li>
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">TETLA E9 Pro (RTO Model)</Link></li>
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">TETLA Pro Plus</Link></li>
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">TETLA Ailes Plus</Link></li>
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">TETLA Voiture</Link></li>
+                            <li><Link href="/products/tetla-classic" className="hover:text-[#00D9A3] transition-colors">TETLA Classic (RTO Model)</Link></li>
+                            <li><Link href="/products/tetla-e9-pro" className="hover:text-[#00D9A3] transition-colors">TETLA E9 Pro (RTO Model)</Link></li>
+                            <li><Link href="/products/tetla-pro-plus" className="hover:text-[#00D9A3] transition-colors">TETLA Pro Plus</Link></li>
+                            <li><Link href="/products/tetla-ailes" className="hover:text-[#00D9A3] transition-colors">TETLA Ailes Plus</Link></li>
+                            <li><Link href="/products/tetla-voiture" className="hover:text-[#00D9A3] transition-colors">TETLA Voiture</Link></li>
                         </ul>
                     </div>
 
@@ -42,11 +42,9 @@ export function Footer() {
                     <div>
                         <h4 className="text-[#999] mb-6 text-sm">Explore</h4>
                         <ul className="space-y-4 text-sm font-medium">
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">Service</Link></li>
                             <li><Link href="/dealerships" className="hover:text-[#00D9A3] transition-colors">Dealership</Link></li>
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">Saving Calculator</Link></li>
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">Warranty</Link></li>
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">TETLA Voiture</Link></li>
+                            <li><Link href="/products/tetla-classic#savings" className="hover:text-[#00D9A3] transition-colors">Saving Calculator</Link></li>
+                            <li><Link href="/products/tetla-voiture" className="hover:text-[#00D9A3] transition-colors">TETLA Voiture</Link></li>
                         </ul>
                     </div>
 
@@ -56,10 +54,10 @@ export function Footer() {
                         <ul className="space-y-4 text-sm font-medium">
                             <li><Link href="/about" className="hover:text-[#00D9A3] transition-colors">About Us</Link></li>
                             <li><Link href="/retail-partner" className="hover:text-[#00D9A3] transition-colors">Retail Partner</Link></li>
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">FAQs</Link></li>
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">Blogs</Link></li>
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">Terms</Link></li>
-                            <li><Link href="#" className="hover:text-[#00D9A3] transition-colors">Privacy Policy</Link></li>
+                            <li><Link href="/#faq" className="hover:text-[#00D9A3] transition-colors">FAQs</Link></li>
+                            <li><Link href="/blog" className="hover:text-[#00D9A3] transition-colors">Blogs</Link></li>
+                            <li><Link href="/terms" className="hover:text-[#00D9A3] transition-colors">Terms</Link></li>
+                            <li><Link href="/privacy" className="hover:text-[#00D9A3] transition-colors">Privacy Policy</Link></li>
                         </ul>
                     </div>
 

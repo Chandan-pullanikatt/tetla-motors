@@ -1,7 +1,11 @@
+import { Header } from "@/app/components/layout/Header";
+import { Footer } from "@/app/components/layout/Footer";
+
 export default function BatteryPage() {
   return (
-    <div className="min-h-screen bg-black text-white pt-32 pb-20">
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
+    <main className="min-h-screen bg-black text-white">
+      <Header variant="solid" />
+      <div className="pt-32 pb-20 max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10">
         <h1 className="text-5xl md:text-[64px] font-bold mb-16 text-center tracking-tight leading-none">
           ADVANCED <span className="text-[#00D9A3]">BATTERY</span> TECH
         </h1>
@@ -57,6 +61,7 @@ export default function BatteryPage() {
           </div>
         </div>
       </div>
-    </div>
+      <Footer />
+    </main>
   );
 }

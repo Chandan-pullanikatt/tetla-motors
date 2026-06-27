@@ -9,8 +9,7 @@ import { Button } from "@/app/components/ui/button";
 import { cn } from "@/app/lib/utils";
 
 const navLinks = [
-    { name: "Products", href: "/products" },
-    { name: "Ownership", href: "/ownership" },
+    { name: "Products", href: "/#vehicles" },
     { name: "Dealership", href: "/dealerships" },
     { name: "About", href: "/about" },
     { name: "Blogs", href: "/blog" },

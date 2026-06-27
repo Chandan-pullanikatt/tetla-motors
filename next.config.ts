@@ -8,6 +8,12 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [{ hostname: "res.cloudinary.com" }],
   },
+  async redirects() {
+    return [
+      // Listing page removed — products now live in the landing-page section.
+      { source: "/products", destination: "/#vehicles", permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -149,10 +149,9 @@ export default function Home() {
 
           <nav className="hidden gap-8 text-sm font-medium text-gray-200 md:flex">
             <a href="#vehicles" className="hover:text-white transition-colors">Products</a>
-            <a href="#ownership" className="hover:text-white transition-colors">Ownership</a>
-            <a href="#dealership" className="hover:text-white transition-colors">Dealership</a>
-            <a href="#about" className="hover:text-white transition-colors">About</a>
-            <a href="#blogs" className="hover:text-white transition-colors">Blogs</a>
+            <a href="/dealerships" className="hover:text-white transition-colors">Dealership</a>
+            <a href="/about" className="hover:text-white transition-colors">About</a>
+            <a href="/blog" className="hover:text-white transition-colors">Blogs</a>
           </nav>
 
           <button
@@ -167,10 +166,9 @@ export default function Home() {
           {mobileMenuOpen && (
             <div className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 bg-black/95 text-xl font-medium text-white md:hidden">
               <a href="#vehicles" onClick={() => setMobileMenuOpen(false)}>Products</a>
-              <a href="#ownership" onClick={() => setMobileMenuOpen(false)}>Ownership</a>
-              <a href="#dealership" onClick={() => setMobileMenuOpen(false)}>Dealership</a>
-              <a href="#about" onClick={() => setMobileMenuOpen(false)}>About</a>
-              <a href="#blogs" onClick={() => setMobileMenuOpen(false)}>Blogs</a>
+              <a href="/dealerships" onClick={() => setMobileMenuOpen(false)}>Dealership</a>
+              <a href="/about" onClick={() => setMobileMenuOpen(false)}>About</a>
+              <a href="/blog" onClick={() => setMobileMenuOpen(false)}>Blogs</a>
             </div>
           )}
         </header>

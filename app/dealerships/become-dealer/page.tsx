@@ -1,11 +1,14 @@
 "use client";
 
 import { Button } from "@/app/components/ui/button";
+import { Header } from "@/app/components/layout/Header";
+import { Footer } from "@/app/components/layout/Footer";
 
 export default function BecomeDealerPage() {
     return (
-        <div className="min-h-screen bg-black text-white pt-32 pb-20">
-            <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 max-w-5xl">
+        <main className="min-h-screen bg-black text-white">
+            <Header variant="solid" />
+            <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 max-w-5xl pt-32 pb-20">
                 <h1 className="text-4xl md:text-[64px] font-bold mb-8 tracking-tight leading-none text-center">
                     BECOME A <span className="text-[#00D9A3]">PARTNER</span>
                 </h1>
@@ -52,6 +55,7 @@ export default function BecomeDealerPage() {
                     </form>
                 </div>
             </div>
-        </div>
+            <Footer />
+        </main>
     );
 }

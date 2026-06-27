@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { Header } from "@/app/components/layout/Header";
+import { Footer } from "@/app/components/layout/Footer";
 
 export default function ContactPage() {
   const handleSubmit = (e: React.FormEvent) => {
@@ -9,8 +11,9 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 py-16 sm:py-20 lg:py-20">
+    <main className="min-h-screen bg-black text-white">
+      <Header variant="solid" />
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-10 pt-32 pb-20">
         {/* Hero section */}
         <section className="text-center mb-12 sm:mb-16 lg:mb-20">
           <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-bold tracking-tight mb-3">
@@ -156,6 +159,7 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
-    </div>
+      <Footer />
+    </main>
   );
 }

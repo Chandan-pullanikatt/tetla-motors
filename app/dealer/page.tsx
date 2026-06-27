@@ -1,6 +1,11 @@
+import { Header } from "@/app/components/layout/Header";
+import { Footer } from "@/app/components/layout/Footer";
+
 export default function DealerPage() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12">
+    <main className="min-h-screen bg-black text-white">
+      <Header variant="solid" />
+      <div className="mx-auto max-w-4xl px-4 pt-32 pb-20">
       <h1 className="text-2xl font-semibold">Become a Dealer</h1>
 
       <p className="mt-3 text-sm text-slate-300">
@@ -45,6 +50,8 @@ export default function DealerPage() {
           Submit Application
         </button>
       </form>
-    </div>
+      </div>
+      <Footer />
+    </main>
   );
 }
